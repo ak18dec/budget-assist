@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+backend/.venv/
+backend/__pycache__/
+*.sqlite3
+.env
+
+# Node
+node_modules/
+frontend/node_modules/
+
+# Chroma/embeddings cache
+chroma-collections/
+
+# Editor and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Tests
+.pytest_cache/
