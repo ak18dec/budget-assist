@@ -1,0 +1,102 @@
+/**
+ * RecentTransactions Component Styles
+ */
+
+.recent-transactions-container {
+  background: var(--card);
+  padding: 16px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.recent-transactions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.recent-transactions-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-text);
+  margin: 0;
+}
+
+.recent-transactions-view-all {
+  background: transparent;
+  border: none;
+  color: var(--brand-primary);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s;
+}
+
+.recent-transactions-view-all:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.recent-transactions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.recent-transaction-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.recent-transaction-item:last-child {
+  border-bottom: none;
+}
+
+.recent-transaction-item:hover {
+  background: rgba(15, 23, 42, 0.02);
+  padding: 12px 4px;
+  border-radius: 4px;
+}
+
+.recent-transaction-details {
+  flex: 1;
+}
+
+.recent-transaction-desc {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--primary-text);
+  margin-bottom: 4px;
+}
+
+.recent-transaction-date {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.recent-transaction-amount {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--primary-text);
+}
+
+.recent-transaction-amount.expense {
+  color: var(--danger);
+}
+
+.recent-transaction-amount.income {
+  color: var(--success);
+}
+
+.recent-transaction-empty {
+  text-align: center;
+  padding: 24px 16px;
+  color: var(--muted);
+  font-size: 14px;
+}

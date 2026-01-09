@@ -1,0 +1,66 @@
+/**
+ * FinancialChart Component Styles
+ */
+
+.financial-chart-container {
+  background: var(--card);
+  padding: 16px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.financial-chart-header {
+  margin-bottom: 12px;
+}
+
+.financial-chart-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-text);
+  margin: 0 0 8px 0;
+}
+
+.financial-chart-subtitle {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.financial-chart-wrapper {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+}
+
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--primary-text);
+}
+
+.chart-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: var(--muted);
+  font-size: 14px;
+}

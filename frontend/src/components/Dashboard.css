@@ -1,0 +1,62 @@
+/**
+ * Dashboard Component Styles
+ */
+
+.dashboard-container {
+  margin-top: 10px;
+}
+
+.summary-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.summary-item {
+  background: var(--card);
+  padding: 8px 10px;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  flex: 1;
+  min-width: 120px;
+}
+
+.summary-item-label {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.summary-item-value {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--primary-text);
+}
+
+.chart-container {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.dashboard-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-text);
+}
+
+.dashboard-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--primary-text);
+}

@@ -1,9 +1,10 @@
 import React, {useState} from 'react'
 import axios from 'axios'
+import './ChatPanel.css'
 
-export default function ChatPanel(){
+export default function ChatPanel({ expanded, onToggle }){
   const [text, setText] = useState('')
-  const [history, setHistory] = useState([])
+  const [history, setHistory] = useState(['Welcome! How can I assist you with your finances today?'].map(t=>({from:'bot', text:t})))
   const [loading, setLoading] = useState(false)
 
   async function send(){
@@ -21,17 +22,30 @@ export default function ChatPanel(){
   }
 
   return (
-    <div style={{marginTop:20}}>
-      <h3>Assistant</h3>
-      <div style={{border:'1px solid #ddd', padding:12, minHeight:80}}>
-        {history.map((m,i)=> (
-          <div key={i} style={{textAlign: m.from==='user' ? 'right' : 'left'}}>{m.text}</div>
-        ))}
+    <div className="chat-panel">
+      <div className="chat-header">
+        {expanded && <h3 style={{marginTop:0, margin:0}}>Assistant</h3>}
+        <button 
+          className="chat-toggle"
+          onClick={onToggle}
+          title={expanded ? 'Collapse' : 'Expand'}
+        >
+          {expanded ? '⟨' : '⟩'}
+        </button>
       </div>
-      <div style={{marginTop:8}}>
-        <input value={text} onChange={e=>setText(e.target.value)} placeholder="Ask about budgets, spending, goals" style={{width:'70%'}} />
-        <button onClick={send} disabled={loading}>{loading? '...' : 'Send'}</button>
-      </div>
+      {expanded && (
+        <>
+          <div className="chat-window">
+            {history.map((m,i)=> (
+              <div key={i} className={`chat-message ${m.from==='user'? 'user':'bot'}`}>{m.text}</div>
+            ))}
+          </div>
+          <div className="chat-input-container">
+            <input className="chat-input" value={text} onChange={e=>setText(e.target.value)} placeholder="Ask about budgets, spending, goals" />
+            <button className="button" onClick={send} disabled={loading}>{loading? '...' : 'Send'}</button>
+          </div>
+        </>
+      )}
     </div>
   )
 }

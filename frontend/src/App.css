@@ -1,0 +1,230 @@
+/**
+ * Global Styles and CSS Variables
+ * LinkedIn Design System
+ */
+
+/* Import Custom Fonts - SF Pro Display is native, using system fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* macOS-inspired colors and tokens */
+  --bg: #F6F6F7;
+  --window: #FFFFFF;
+  --card: #F2F2F7;
+  --sidebar-bg: rgba(245,245,248,0.9);
+  --muted: #6B6B70;
+  --primary-text: #1C1C1E;
+
+  /* Accent (system blue) */
+  --accent: #0A84FF;
+  --accent-strong: #0060DF;
+
+  /* Spacing & Borders */
+  --radius: 10px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+
+  /* Shadows (subtle like macOS) */
+  --shadow: 0 6px 18px rgba(60,60,67,0.08);
+  --shadow-light: 0 2px 6px rgba(60,60,67,0.06);
+  --shadow-medium: 0 10px 30px rgba(60,60,67,0.09);
+
+  /* Glass / vibrancy */
+  --glass: rgba(255,255,255,0.72);
+  --glass-strong: rgba(250,250,250,0.6);
+
+  /* Status colors */
+  /* --success: #30D158; */
+  --success: #159969;
+  /* --danger: #FF3B30; */
+  --danger: #d62929;
+  --warning: #FF9F0A;
+
+  /* Borders */
+  --border-light: rgba(60,60,67,0.12);
+  --border-lighter: rgba(60,60,67,0.08);
+
+  /* Typography - SF Pro Display for headings, SF Pro Text for body (system stack)
+     SF fonts are native on macOS; other platforms will fall back to sensible fonts */
+  --font-family-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-family-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+/* Reset and Base Styles */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: var(--font-family-body);
+  background: var(--bg);
+  color: var(--primary-text);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Typography - Headings use SF Pro Display */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-display);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+h1 {
+  font-size: 32px;
+}
+
+h2 {
+  font-size: 28px;
+}
+
+h3 {
+  font-size: 24px;
+}
+
+h4 {
+  font-size: 20px;
+}
+
+h5 {
+  font-size: 18px;
+}
+
+h6 {
+  font-size: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Layout */
+.app-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* Card Base Styles */
+.card {
+  background: var(--glass);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-light);
+  padding: 14px;
+  border: 1px solid var(--border-lighter);
+  backdrop-filter: blur(6px);
+}
+
+/* Utility Classes */
+.muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.card h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+}
+
+/* Button Base Styles */
+.button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.08s ease, box-shadow 0.12s ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(10,132,255,0.12);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button:focus-visible {
+  box-shadow: 0 0 0 4px rgba(10,132,255,0.12);
+  outline: none;
+}
+
+/* Form Elements */
+.form-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.form-row input[type='text'],
+.form-row input[type='date'],
+.form-row input[type='number'] {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  background: var(--window);
+  font-family: var(--font-family);
+}
+
+input::placeholder {
+  color: var(--muted);
+}
+
+/* Delta indicators */
+.delta-up {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.delta-down {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+/* Tooltip */
+.chart-tooltip {
+  background: var(--window);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-medium);
+  border: 1px solid var(--border-lighter);
+}
+
+/* macOS-specific helpers */
+.glass { backdrop-filter: blur(6px); background: var(--glass); border-radius: var(--radius); }
+
+/* Sidebar collapsed helpers */
+.sidebar.collapsed .nav-label { display: none; }
+.sidebar.collapsed .brand { display: none; }
+.sidebar.collapsed .sidebar-footer { display: none; }
+
+/* Focus Styles for Accessibility */
+.icon-btn:focus-visible,
+.button:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.22);
+  outline-offset: 2px;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .app-container {
+    grid-template-columns: 1fr;
+  }
+}

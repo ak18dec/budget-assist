@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
+import SavingsPie from './SavingsPie'
+import './Dashboard.css'
 
 export default function Dashboard(){
   const [summary, setSummary] = useState(null)
@@ -24,13 +26,28 @@ export default function Dashboard(){
     return (
       <div style={{marginTop:10}}>
         <h3>Summary</h3>
-        <div>Total spent: ${summary.total_spent}</div>
-        <div>Transactions: {summary.transactions_count}</div>
-        <div>
-          Budgets: {summary.budgets?.length || 0} — {summary.budgets?.map(b=> `${b.name}: $${b.amount}`).join(', ')}
+        <div className="summary-row">
+          <div className="summary-item">
+            <div className="muted">Total Spent</div>
+            <div style={{fontWeight:700}}>${summary.total_spent}</div>
+          </div>
+          <div className="summary-item">
+            <div className="muted">Transactions</div>
+            <div style={{fontWeight:700}}>{summary.transactions_count}</div>
+          </div>
+          <div className="summary-item">
+            <div className="muted">Budgets</div>
+            <div style={{fontWeight:700}}>{summary.budgets?.length || 0}</div>
+          </div>
+          <div className="summary-item">
+            <div className="muted">Goals</div>
+            <div style={{fontWeight:700}}>{summary.goals?.length || 0}</div>
+          </div>
         </div>
-        <div>
-          Goals: {summary.goals?.length || 0} — {summary.goals?.map(g=> `${g.name}: $${g.saved_amount}/${g.target_amount}`).join(', ')}
+        <div style={{marginTop:12, display:'grid', gridTemplateColumns:'1fr', gap:12}}>
+          <div className="card">
+            <SavingsPie data={summary.expenses_by_category || undefined} />
+          </div>
         </div>
       </div>
     )

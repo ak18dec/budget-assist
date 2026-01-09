@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import axios from 'axios'
+import './TransactionForm.css'
 
 export default function TransactionForm(){
   const [amount, setAmount] = useState('')
@@ -19,13 +20,13 @@ export default function TransactionForm(){
   }
 
   return (
-    <form onSubmit={submit} style={{marginTop:20}}>
+    <form onSubmit={submit}>
       <h3>Add Transaction</h3>
-      <div>
-        <input placeholder="Amount" value={amount} onChange={e=>setAmount(e.target.value)} />
+      <div className="form-row">
+        <input type="number" step="0.01" placeholder="Amount" value={amount} onChange={e=>setAmount(e.target.value)} />
         <input placeholder="Category" value={category} onChange={e=>setCategory(e.target.value)} />
         <input type="date" value={date} onChange={e=>setDate(e.target.value)} />
-        <button type="submit">Add</button>
+        <button className="button" type="submit">Add</button>
       </div>
     </form>
   )

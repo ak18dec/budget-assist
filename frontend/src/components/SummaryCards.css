@@ -1,0 +1,65 @@
+/**
+ * SummaryCards Component Styles
+ */
+
+.summary-card {
+  /* background: var(--card); */
+  padding: 16px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  min-height: 140px;
+  flex-direction: column;
+}
+
+.summary-card-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.summary-card-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.small-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+.summary-card-label {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.summary-card-value {
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--primary-text);
+}
+
+.summary-card-delta {
+  font-weight: 500;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.summary-card-delta.positive {
+  color: var(--success);
+}
+
+.summary-card-delta.negative {
+  color: var(--danger);
+}

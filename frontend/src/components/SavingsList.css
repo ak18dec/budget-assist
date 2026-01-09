@@ -1,0 +1,128 @@
+/**
+ * SavingsList Component Styles
+ */
+
+.savings-list-container {
+  background: var(--card);
+  padding: 16px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.savings-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.savings-list-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-text);
+  margin: 0;
+}
+
+.savings-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.savings-item {
+  background: rgba(15, 23, 42, 0.02);
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--brand-primary);
+  transition: all 0.2s;
+}
+
+.savings-item:hover {
+  background: rgba(15, 23, 42, 0.04);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.savings-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.savings-item-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--primary-text);
+}
+
+.savings-item-amount {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--brand-primary);
+}
+
+.savings-item-goal {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.savings-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(15, 23, 42, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.savings-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.savings-item-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.savings-item-progress {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.savings-item-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.savings-item-btn {
+  background: transparent;
+  border: 1px solid var(--border-light);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.savings-item-btn:hover {
+  background: var(--brand-primary);
+  color: white;
+  border-color: var(--brand-primary);
+}
+
+.savings-empty {
+  text-align: center;
+  padding: 24px 16px;
+  color: var(--muted);
+  font-size: 14px;
+}
