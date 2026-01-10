@@ -67,12 +67,16 @@
   margin-top: 6px;
 }
 
+.nav.middle {
+    flex: 0 0 70%;
+}
+
 .nav-item {
   display: flex;
-  gap: 12px;
+  gap: 6px;
   align-items: center;
-  padding: 10px 8px;
-  border-radius: 10px;
+  padding: 5px 5px;
+  border-radius: 5px;
   cursor: pointer;
   margin-bottom: 6px;
   transition: background 0.12s, transform 0.06s;
@@ -112,11 +116,11 @@
 .nav-item svg rect {
   transition: stroke 0.12s, fill 0.12s;
   stroke: currentColor;
-  fill: currentColor;
+  /* fill: currentColor; */
 }
 
 .nav-item.active .nav-icon {
-  background: rgba(10,132,255,0.08);
+  /* background: rgba(10,132,255,0.08); */
   color: var(--accent-strong);
 }
 

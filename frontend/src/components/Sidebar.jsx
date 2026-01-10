@@ -1,10 +1,11 @@
 import React, {useState} from 'react'
 import { FiGrid, FiList, FiDollarSign, FiUsers, FiBarChart2, FiBell, FiHelpCircle, FiSettings, FiChevronRight } from 'react-icons/fi'
+import { GoCreditCard } from "react-icons/go";
 import './Sidebar.css'
 
 const navItems = [
   {key:'dashboard', label:'Dashboard', icon:FiGrid},
-  {key:'transactions', label:'Transactions', icon:FiList},
+  {key:'transactions', label:'Transactions', icon:GoCreditCard},
   {key:'budget', label:'Budget Planner', icon:FiDollarSign},
   {key:'accounts', label:'Accounts', icon:FiUsers},
   {key:'reports', label:'Reports', icon:FiBarChart2},
@@ -37,7 +38,7 @@ export default function Sidebar({ expanded, onToggle }){
         </button>
       </div>
 
-      <nav className="nav">
+      <nav className="nav middle">
         {navItems.map(i=> (
           <NavItem key={i.key} icon={i.icon} label={expanded ? i.label : ''} active={active===i.key} onClick={()=>setActive(i.key)} />
         ))}
