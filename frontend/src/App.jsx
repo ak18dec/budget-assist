@@ -104,7 +104,7 @@ function NotificationBell(){
 }
 
 export default function App(){
-  const [chatExpanded, setChatExpanded] = React.useState(true)
+  const [chatExpanded, setChatExpanded] = React.useState(false)
   const [sidebarExpanded, setSidebarExpanded] = React.useState(true)
 
   return (

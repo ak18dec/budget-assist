@@ -1,5 +1,6 @@
 import React, {useMemo, useState} from 'react'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from 'recharts'
+import { FiInfo, FiArrowUp, FiArrowDown } from 'react-icons/fi'
 import './FinancialChart.css'
 
 const sampleData = [
@@ -33,26 +34,34 @@ function CustomTooltip({active, payload, label}){
   const Delta = ({val})=>{
     if(val===0) return <span className="muted">0%</span>
     const up = val>0
-    return <span className={up? 'delta-up': 'delta-down'}>{up? '▲':'▼'} {Math.abs(val)}%</span>
+    return <span className={up? 'delta-up': 'delta-down'} style={{fontSize:12}}>{up? <FiArrowUp />:<FiArrowDown />} {Math.abs(val)}%</span>
   }
 
   return (
-    <div className="chart-tooltip card" style={{padding:12, minWidth:180}}>
-      <div style={{fontSize:12, color:'#6b7280', marginBottom:6}}>{label.toUpperCase()} 2025</div>
-      <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-        <div>
-          <div style={{fontWeight:700}}>{formatMoney(income)}</div>
-          <div className="muted">Income</div>
+    <div className="chart-tooltip card" style={{padding:12, minWidth:180, paddingLeft:10}}>
+      <div style={{fontSize:12, fontWeight:'550',color:'#6b7280', marginBottom:6}}>{label.toUpperCase()} 2025</div>
+      <div style={{ display:'flex', gap:8}}>
+        <div style={{width:4, height:40, backgroundColor:'var(--accent)', borderRadius:5}}></div>
+        <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', gap:4}}>
+          <div>
+            <div style={{fontWeight:550}}>{formatMoney(income)}</div>
+            {/* <div className="muted">Income</div> */}
+          </div>
+          <div style={{textAlign:'left', display:'flex', flexDirection:'row', alignItems:'flex-end', gap:4}}>
+            <Delta val={incomeDelta} /><div className="muted" style={{fontSize:12}}>vs last month</div></div>
         </div>
-        <div style={{textAlign:'right'}}><Delta val={incomeDelta} /><div className="muted" style={{fontSize:12}}>vs last month</div></div>
       </div>
       <div style={{height:10}} />
-      <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-        <div>
-          <div style={{fontWeight:700}}>{formatMoney(expense)}</div>
-          <div className="muted">Expense</div>
+      <div style={{ display:'flex', gap:8}}>
+        <div style={{width:4, height:40, backgroundColor:'var(--muted-blue)', borderRadius:5}}></div>
+        <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', gap:4}}>
+          <div>
+            <div style={{fontWeight:550}}>{formatMoney(expense)}</div>
+            {/* <div className="muted">Expense</div> */}
+          </div>
+          <div style={{textAlign:'left', display:'flex', flexDirection:'row', alignItems:'flex-end', gap:4}}>
+            <Delta val={expenseDelta} /><div className="muted" style={{fontSize:12}}>vs last month</div></div>
         </div>
-        <div style={{textAlign:'right'}}><Delta val={expenseDelta} /><div className="muted" style={{fontSize:12}}>vs last month</div></div>
       </div>
     </div>
   )
@@ -80,12 +89,14 @@ export default function FinancialChart({data}){
   return (
     <div>
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8}}>
-        <div style={{fontWeight:700}}>Financial Insights</div>
+        <div style={{display:'flex', alignItems:'center', gap:6, fontWeight:500}}>Financial Insights <FiInfo color='var(--muted-gray)' size={15} /></div>
         <div style={{display:'flex', gap:12, alignItems:'center'}}>
-          <div style={{display:'flex', gap:8, alignItems:'center'}}><div style={{width:10,height:10,background:'var(--accent)',borderRadius:3}} /> <div className="muted">Income</div></div>
-          <div style={{display:'flex', gap:8, alignItems:'center'}}><div style={{width:10,height:10,background:'var(--card)',borderRadius:3}} /> <div className="muted">Expense</div></div>
-          <select className="muted" style={{padding:6, borderRadius:8, border:'1px solid var(--border-lighter)'}}>
+          <div style={{display:'flex', gap:8, alignItems:'center'}}><div style={{width:8,height:8,background:'var(--accent)',borderRadius:5}} /> <div className="muted">Income</div></div>
+          <div style={{display:'flex', gap:8, alignItems:'center'}}><div style={{width:8,height:8,background:'var(--muted-blue)',borderRadius:5}} /> <div className="muted">Expense</div></div>
+          <select className="muted" style={{padding:6, borderRadius:8, border:'1px solid var(--border-light)'}}>
             <option>This year</option>
+            <option>Last year</option>
+            <option>Last 5 years</option>
           </select>
         </div>
       </div>
@@ -93,18 +104,23 @@ export default function FinancialChart({data}){
       <div style={{width: '100%', height: 300}}>
         <ResponsiveContainer>
           <BarChart data={withDelta} margin={{top: 10, right: 8, left: 0, bottom: 0}}>
-            <CartesianGrid strokeDasharray="6 6" stroke="var(--border-lighter)" />
-            <XAxis dataKey="month" tick={{fill:'var(--muted)'}} />
-            <YAxis tick={{fill:'var(--muted)'}} tickFormatter={v=>`$${(v/1000).toFixed(0)}k`} />
+            <CartesianGrid horizontal={true} vertical={false} strokeDasharray="6 6" stroke="var(--border-lighter)" />
+            <XAxis
+              dataKey="month"
+              tick={{fill:'var(--muted)', fontSize:12}}
+              axisLine={{ stroke: 'var(--border-lighter)', strokeWidth: 1 }}
+              tickLine={false}
+            />
+            <YAxis axisLine={false} tickLine={false} tick={{fill:'var(--muted)', fontSize:12}} tickFormatter={v => `$${(v/1000).toFixed(0)}K`} />
             <Tooltip content={<CustomTooltip/>} />
-            <Bar dataKey="income" barSize={18} radius={[6,6,0,0]} onClick={handleBarClick}>
+            <Bar dataKey="income" barSize={18} radius={[3,3,0,0]} onClick={handleBarClick}>
               {withDelta.map((entry, idx) => (
                 <Cell key={`income-${idx}`} fill={entry.month===selectedMonth? 'var(--accent-strong)' : 'var(--accent)'} style={entry.month===selectedMonth? {filter:'drop-shadow(0 6px 18px rgba(10,132,255,0.18))'}:{}} />
               ))}
             </Bar>
-            <Bar dataKey="expense" barSize={18} radius={[6,6,0,0]} onClick={handleBarClick}>
+            <Bar dataKey="expense" barSize={18} radius={[3,3,0,0]} onClick={handleBarClick}>
               {withDelta.map((entry, idx) => (
-                <Cell key={`exp-${idx}`} fill={entry.month===selectedMonth? 'rgba(10,132,255,0.08)' : 'var(--card)'} />
+                <Cell key={`exp-${idx}`} fill={entry.month===selectedMonth? 'rgba(10,132,255,0.08)' : 'var(--muted-blue)'} />
               ))}
             </Bar>
           </BarChart>
