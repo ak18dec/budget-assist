@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
+import { FiInfo } from 'react-icons/fi'
 import './RecentTransactions.css'
 
 const DUMMY = [
@@ -37,7 +38,7 @@ export default function RecentTransactions(){
   return (
     <div>
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-        <h3 style={{marginTop:0}}>Recent Transactions</h3>
+        <h3 style={{marginTop:0, fontWeight: 500}}>Recent Transactions <FiInfo color='var(--muted-gray)' size={15} /></h3>
         <div className="muted">Last 30 days</div>
       </div>
 

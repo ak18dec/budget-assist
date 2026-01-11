@@ -1,6 +1,6 @@
 import React from 'react'
 import './App.css'
-import { FiBell } from 'react-icons/fi'
+import { FiBell, FiInfo } from 'react-icons/fi'
 import TransactionForm from './components/TransactionForm'
 import TransactionList from './components/TransactionList'
 import Dashboard from './components/Dashboard'
@@ -140,7 +140,7 @@ export default function App(){
           {!chatExpanded && (
             <div className="card">
               <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                <h3 style={{marginTop:0}}>Savings</h3>
+                <h3 style={{marginTop:0, fontWeight: 500}}>Savings <FiInfo color='var(--muted-gray)' size={15} /></h3> 
                 <div style={{display:'flex', gap:8}}>
                   <button className="pie-tab active">All</button>
                   <button className="pie-tab">Goals</button>
