@@ -95,7 +95,7 @@ export default function Topbar(){
     <div className="topbar">
       <div className="topbar-left">
         <div>
-          <h1 style={{margin:0, marginBottom:5}}>Good Morning, Ilham</h1>
+          <h1 style={{margin:0, marginBottom:5}}>Good Morning, Harry</h1>
           <div className="muted" style={{fontSize:14}}>Welcome to your financial insights.</div>
         </div>
       </div>

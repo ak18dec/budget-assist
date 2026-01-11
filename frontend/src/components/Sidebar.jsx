@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import { FiGrid, FiList, FiDollarSign, FiUsers, FiBarChart2, FiBell, FiHelpCircle, FiSettings, FiChevronRight } from 'react-icons/fi'
 import { GoCreditCard } from "react-icons/go";
 import './Sidebar.css'
+import Logo from '../assets/logo.svg'
 
 const navItems = [
   {key:'dashboard', label:'Dashboard', icon:FiGrid},
@@ -26,16 +27,16 @@ export default function Sidebar({ expanded, onToggle }){
 
   return (
     <aside className={`sidebar card ${expanded ? '' : 'collapsed'}`}>
-      <div className="brand-row">
-        <div className="brand-mark"> <div className="cube"/> </div>
+      <div className="brand-row" onClick={onToggle} style={{cursor:'pointer'}}>
+        <div className="brand-mark"> <div className="cube1"/> <img src={Logo} alt="Budget Assist" className="app-logo" /> </div>
         {expanded && <div className="brand">BudgetAssist</div>}
-        <button 
+        {/* <button 
           className="sidebar-toggle"
           onClick={onToggle}
           title={expanded ? 'Collapse' : 'Expand'}
         >
           {expanded ? '‹' : '›'}
-        </button>
+        </button> */}
       </div>
 
       <nav className="nav middle">
@@ -54,8 +55,8 @@ export default function Sidebar({ expanded, onToggle }){
           <div className="profile">
             <img src="https://i.pravatar.cc/40?img=5" alt="avatar" className="avatar" />
             <div className="profile-meta">
-              <div className="profile-name">Ilham Rusdi</div>
-              <div className="muted" style={{fontSize:12}}>ilhamrus@gmail.com</div>
+              <div className="profile-name">Harry Potter</div>
+              <div className="muted" style={{fontSize:12}}>harry@gmail.com</div>
             </div>
             <FiChevronRight size={18} className="chev" />
           </div>

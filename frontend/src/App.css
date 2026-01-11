@@ -148,7 +148,7 @@ h6 {
   color: white;
   border: none;
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 5px;
   cursor: pointer;
   font-weight: 600;
   transition: transform 0.08s ease, box-shadow 0.12s ease;
