@@ -18,8 +18,10 @@
   --primary-text: #1C1C1E;
 
   /* Accent (system blue) */
-  --accent: #0A84FF;
+  --accent-old: #0A84FF;
+  --accent: #5582d6;
   --accent-strong: #0060DF;
+
 
   /* Spacing & Borders */
   --radius: 10px;

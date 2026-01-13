@@ -22,7 +22,7 @@ const SummaryCard = ({title, value, delta, positive=true, color, points}) => (
     <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', height:'100%'}}>
       <div style={{display:'flex', flexDirection:'column', gap:10}}>
         <div className="small-icon" style={{background:'rgba(59,130,246,0.06)'}}>
-          <FiCreditCard size={18} style={{color:'#3b82f6'}} />
+          <FiCreditCard size={18} style={{color:'#5582d6'}} />
         </div>
         <div>
           <div className="muted" style={{fontSize:15}}>{title}</div>

@@ -21,7 +21,8 @@ export const colors = {
 
   // Accent colors (macOS system blue)
   accent: {
-    primary: '#0A84FF',
+    primaryOld: '#0A84FF',
+    primary: '#5582d6',
     primaryHover: '#0060DF'
   },
 

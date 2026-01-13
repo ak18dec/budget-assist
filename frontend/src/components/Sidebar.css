@@ -108,7 +108,7 @@
 }
 
 .nav-item.active .nav-label {
-  color: var(--accent-strong);
+  color: var(--accent);
 }
 
 /* SVG Icon color changes - now using currentColor */
@@ -121,7 +121,7 @@
 
 .nav-item.active .nav-icon {
   /* background: rgba(10,132,255,0.08); */
-  color: var(--accent-strong);
+  color: var(--accent);
 }
 
 /* Collapsed state visuals */

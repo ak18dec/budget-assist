@@ -47,18 +47,18 @@ export default function RecentTransactions(){
           <div key={tx.id} style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 6px', borderBottom:'1px solid #f1f5f9'}}>
             <div style={{display:'flex', alignItems:'center', gap:12}}>
               <div style={{width:40, height:40, borderRadius:10, background:'#fff', boxShadow:'0 1px 2px rgba(0,0,0,0.03)', display:'flex', alignItems:'center', justifyContent:'center'}}>
-                <div style={{fontWeight:700, color:'#334155'}}>{(tx.name||'?').slice(0,1)}</div>
+                <div style={{fontWeight:500, color:'#334155'}}>{(tx.name||'?').slice(0,1)}</div>
               </div>
               <div>
-                <div style={{fontWeight:700}}>{tx.name}</div>
-                <div className="muted" style={{fontSize:13}}>{tx.category}</div>
+                <div style={{fontWeight:500, fontSize: 13}}>{tx.name}</div>
+                <div className="muted" style={{fontSize:12}}>{tx.category}</div>
               </div>
             </div>
 
             <div style={{display:'flex', gap:24, alignItems:'center', minWidth:340, justifyContent:'flex-end'}}>
               <div style={{width:120, textAlign:'left'}} className="muted">{tx.account || '—'}</div>
               <div className="muted" style={{width:140, textAlign:'left'}}>{fmtDate(tx.date)}</div>
-              <div style={{width:120, textAlign:'right', fontWeight:700, color: tx.amount >= 0 ? '#16a34a' : '#ef4444'}}>{fmtMoney(tx.amount)}</div>
+              <div style={{width:120, textAlign:'right', fontWeight:500, fontSize:13, color: tx.amount >= 0 ? '#159969' : '#d62929'}}>{fmtMoney(tx.amount)}</div>
             </div>
           </div>
         ))}
