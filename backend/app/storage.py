@@ -46,6 +46,8 @@ def add_budget(budget_data) -> Budget:
     budgets.append(b)
     return b
 
+def list_budgets() -> List[Budget]:
+    return list(budgets)
 
 def add_goal(goal_data) -> Goal:
     global _goal_auto_id
@@ -54,6 +56,8 @@ def add_goal(goal_data) -> Goal:
     goals.append(g)
     return g
 
+def list_goals() -> List[Goal]:
+    return list(goals)
 
 def get_financial_summary() -> FinancialSummary:
     total_spent = sum(tx.amount for tx in transactions)

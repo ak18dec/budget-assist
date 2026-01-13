@@ -14,18 +14,20 @@ class Transaction(TransactionBase):
     id: int
 
 
-class Budget(BaseModel):
-    id: int
+class BudgetBase(BaseModel):
     name: str
     amount: float
 
-
-class Goal(BaseModel):
+class Budget(BudgetBase):
     id: int
+
+class GoalBase(BaseModel):
     name: str
     target_amount: float
     saved_amount: float = 0.0
 
+class Goal(GoalBase):
+    id: int
 
 class FinancialSummary(BaseModel):
     total_spent: float
