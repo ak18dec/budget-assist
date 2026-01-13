@@ -3,6 +3,8 @@ import axios from 'axios'
 import './ChatPanel.css'
 import { GoDependabot } from "react-icons/go";
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 export default function ChatPanel({ expanded, onToggle }){
   const [text, setText] = useState('')
   const [history, setHistory] = useState(['Welcome! How can I assist you with your finances today?'].map(t=>({from:'bot', text:t})))
@@ -22,7 +24,7 @@ export default function ChatPanel({ expanded, onToggle }){
     setText('')
     setLoading(true)
     try{
-      const res = await axios.post('/api/v1/chat/', {message})
+      const res = await axios.post(`${API_URL}/chat/`, {message})
       setHistory(h=>[...h, {from:'bot', text:res.data.response}])
     }catch(err){
       setHistory(h=>[...h, {from:'bot', text:'Failed to get response'}])
