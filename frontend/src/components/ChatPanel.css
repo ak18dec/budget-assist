@@ -7,6 +7,7 @@
   flex-direction: column;
   gap: 8px;
   height: 100%;
+  padding-bottom: 30px;
 }
 
 .chat-header {
@@ -50,6 +51,7 @@
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-light);
   backdrop-filter: blur(6px);
+  font-size: 13px;
 }
 
 .chat-message {

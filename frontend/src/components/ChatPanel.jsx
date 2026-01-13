@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import axios from 'axios'
 import './ChatPanel.css'
+import { GoDependabot } from "react-icons/go";
 
 export default function ChatPanel({ expanded, onToggle }){
   const [text, setText] = useState('')
@@ -24,13 +25,13 @@ export default function ChatPanel({ expanded, onToggle }){
   return (
     <div className="chat-panel">
       <div className="chat-header">
-        {expanded && <h3 style={{marginTop:0, margin:0}}>Assistant</h3>}
+        {expanded && <h3 style={{marginTop:0, margin:0}}>BudgetAI</h3>}
         <button 
           className="chat-toggle"
           onClick={onToggle}
           title={expanded ? 'Collapse' : 'Expand'}
         >
-          {expanded ? '⟨' : '⟩'}
+          {expanded ? <GoDependabot /> : <GoDependabot />}
         </button>
       </div>
       {expanded && (
