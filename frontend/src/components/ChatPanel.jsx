@@ -8,6 +8,13 @@ export default function ChatPanel({ expanded, onToggle }){
   const [history, setHistory] = useState(['Welcome! How can I assist you with your finances today?'].map(t=>({from:'bot', text:t})))
   const [loading, setLoading] = useState(false)
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  };
+
   async function send(){
     if(!text) return
     const message = text
@@ -42,7 +49,7 @@ export default function ChatPanel({ expanded, onToggle }){
             ))}
           </div>
           <div className="chat-input-container">
-            <input className="chat-input" value={text} onChange={e=>setText(e.target.value)} placeholder="Ask about budgets, spending, goals" />
+            <input className="chat-input" value={text} onChange={e=>setText(e.target.value)} placeholder="Ask about budgets, spending, goals" onKeyDown={handleKeyPress} />
             <button className="button" onClick={send} disabled={loading}>{loading? '...' : 'Send'}</button>
           </div>
         </>
