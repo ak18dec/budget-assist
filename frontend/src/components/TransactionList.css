@@ -1,6 +1,12 @@
 /**
  * TransactionList Component Styles
  */
+.transactions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
 
 .transactions-list {
   list-style: none;

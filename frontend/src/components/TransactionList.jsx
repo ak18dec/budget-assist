@@ -1,12 +1,15 @@
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
 import TransactionForm from './TransactionForm.jsx'
+import RecentTransactions from './RecentTransactions.jsx'
+import { FiPlus } from 'react-icons/fi'
 import './TransactionList.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
 export default function TransactionList(){
   const [items, setItems] = useState([])
+  // const [showForm, setShowForm] = useState(false);
 
   async function load(){
     try{
@@ -33,10 +36,19 @@ export default function TransactionList(){
   }, [])
 
   return (
-    <div>
-      <h3>Transactions</h3>
-      <TransactionForm onSuccess={load} />
-      <ul className="transactions-list">
+    <div className='card' style={{ gap: 12, display: 'flex', flexDirection: 'column' }}>
+      <div className="transactions-header">
+        <h3>Transactions</h3>
+        {/* <button className='button add' onClick={() => setShowForm(!showForm)}>
+          { showForm ? ('Cancel') : (<><FiPlus size={14} style={{marginRight: 8}} /> Add Transaction</>)}
+        </button> */}
+      </div>
+      {/* {showForm && <TransactionForm onSuccess={load} />} */}
+      <TransactionForm /> 
+      <div className="card">
+        <RecentTransactions onSuccess={load} />
+      </div>
+      {/* <ul className="transactions-list">
         {items.map(tx=> (
           <li key={tx.id}>
             <div>
@@ -46,7 +58,7 @@ export default function TransactionList(){
             <div style={{fontWeight:700}}>${tx.amount}</div>
           </li>
         ))}
-      </ul>
+      </ul> */}
     </div>
   )
 }

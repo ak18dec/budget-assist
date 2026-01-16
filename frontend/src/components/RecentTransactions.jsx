@@ -26,7 +26,7 @@ export default function RecentTransactions(){
     let mounted = true
     async function load(){
       try{
-        const res = await axios.get('/api/v1/transactions/')
+        const res = await axios.post(`${API_URL}/transactions/`, {amount: parseFloat(amount), category, description, date})
         const rows = Array.isArray(res.data)? res.data : (res.data.transactions||res.data.items||[])
         if(mounted && rows.length) setItems(rows.slice(0,8))
       }catch(e){ /* keep dummy data */ }
