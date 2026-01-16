@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
+import TransactionForm from './TransactionForm.jsx'
 import './TransactionList.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
@@ -34,6 +35,7 @@ export default function TransactionList(){
   return (
     <div>
       <h3>Transactions</h3>
+      <TransactionForm onSuccess={load} />
       <ul className="transactions-list">
         {items.map(tx=> (
           <li key={tx.id}>

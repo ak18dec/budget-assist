@@ -187,7 +187,6 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/transactions" element={<TransactionList />} />
-          <Route path="/add-transaction" element={<TransactionForm />} />
           <Route path="/budgets" element={<BudgetList />} />
           <Route path="/goals" element={<GoalsList />} />
         </Route>
