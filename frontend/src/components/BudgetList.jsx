@@ -139,7 +139,7 @@ export default function BudgetList() {
         </thead>
         <tbody>
           {items.map(budget => (
-            <tr key={budget.id}>
+            <tr key={budget.id} style={{ fontSize: 14 }}>
               <td style={{padding: '8px', borderBottom: '1px solid #f1f5f9'}}>{budget.name}</td>
               <td style={{padding: '8px', borderBottom: '1px solid #f1f5f9'}}>{budget.category}</td>
               <td style={{padding: '8px', borderBottom: '1px solid #f1f5f9', textAlign: 'right'}}>${budget.monthly_limit.toFixed(2)}</td>
