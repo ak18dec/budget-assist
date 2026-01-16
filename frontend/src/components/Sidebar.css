@@ -1,31 +1,30 @@
-/**
- * Sidebar Component Styles
- */
-
+/** Sidebar Component Styles */
 .sidebar {
   width: 220px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   padding: 18px;
   height: calc(100vh - 40px);
   box-sizing: border-box;
-  /* background: var(--sidebar-bg); */
   border-right: 1px solid var(--border-lighter);
   backdrop-filter: blur(8px);
 }
 
+/* Reset anchor styles for NavLink */
 .sidebar a {
   text-decoration: none;
   color: inherit;
 }
 
+/* ---------------- Brand ---------------- */
+
 .brand-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   justify-content: space-between;
+  cursor: pointer;
 }
 
 .brand {
@@ -34,61 +33,50 @@
   flex: 1;
 }
 
-.sidebar-toggle {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  color: var(--muted);
-  padding: 4px 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s;
-}
-
-.sidebar-toggle:hover {
-  color: var(--accent);
-}
-
 .brand-mark {
   width: 36px;
   height: 36px;
   display: flex;
   align-items: center;
-  /* justify-content: center; */
 }
 
 .cube {
   width: 18px;
   height: 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(240,240,245,0.9));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(240, 240, 245, 0.9)
+  );
   border-radius: 4px;
-  box-shadow: inset 0 -2px 6px rgba(0,0,0,0.04);
+  box-shadow: inset 0 -2px 6px rgba(0, 0, 0, 0.04);
 }
 
-/* Navigation Items */
+/* ---------------- Navigation ---------------- */
+
 .nav {
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .nav.middle {
-    flex: 0 0 70%;
+  flex: none;
+  display: flex;
+  flex-direction: column;
 }
 
 .nav-item {
   display: flex;
-  gap: 6px;
   align-items: center;
-  padding: 5px 5px;
-  border-radius: 5px;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 6px;
   cursor: pointer;
   margin-bottom: 6px;
-  transition: background 0.12s, transform 0.06s;
+  transition: background 0.12s ease, transform 0.06s ease;
 }
 
 .nav-item:hover {
-  background: rgba(10,132,255,0.06);
+  background: rgba(10, 132, 255, 0.06);
 }
 
 .nav-item .nav-icon {
@@ -99,44 +87,62 @@
   justify-content: center;
   border-radius: 8px;
   color: var(--muted);
-  transition: color 0.12s, background 0.12s;
+  transition: color 0.12s ease;
 }
 
 .nav-item .nav-label {
   color: var(--muted);
   font-weight: 600;
   font-size: 15px;
+  white-space: nowrap;
 }
 
+/* Active state */
 .nav-item.active {
-  background: rgba(10,132,255,0.12);
+  background: rgba(10, 132, 255, 0.12);
 }
 
 .nav-item.active .nav-label {
   color: var(--accent);
 }
 
-/* SVG Icon color changes - now using currentColor */
-.nav-item svg path,
-.nav-item svg rect {
-  transition: stroke 0.12s, fill 0.12s;
-  stroke: currentColor;
-  /* fill: currentColor; */
-}
-
 .nav-item.active .nav-icon {
-  /* background: rgba(10,132,255,0.08); */
   color: var(--accent);
 }
 
-/* Collapsed state visuals */
-.sidebar.collapsed { width: 70px; padding-left: 12px; padding-right: 12px; }
-.sidebar.collapsed .brand-mark { margin-right: 0; }
-.sidebar.collapsed .nav-item { padding: 8px; justify-content: center; }
-.sidebar.collapsed .nav-icon { width: 28px; height: 28px; }
+/* SVG color consistency */
+.nav-item svg path,
+.nav-item svg rect {
+  stroke: currentColor;
+  transition: stroke 0.12s, fill 0.12s;
+}
 
-/* Sidebar Footer */
+/* ---------------- Collapsed Sidebar ---------------- */
+
+.sidebar.collapsed {
+  width: 70px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 8px;
+}
+
+.sidebar.collapsed .nav-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.sidebar.collapsed .nav-label {
+  display: none;
+}
+
+/* ---------------- Footer ---------------- */
+
 .sidebar-footer {
+  margin-top: auto;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -146,42 +152,49 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  align-items: flex-start;
 }
 
 .footer-action {
   display: flex;
-  gap: 8px;
   align-items: center;
+  gap: 8px;
   padding: 8px 6px;
   border-radius: var(--radius-sm);
-  width: 100%;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s ease;
 }
 
 .footer-action:hover {
   background: rgba(15, 23, 42, 0.03);
 }
 
-.footer-action .muted {
-  margin-left: 8px;
+.footer-label {
   font-size: 13px;
 }
 
-/* Profile Section */
+/* Footer collapsed behavior */
+.sidebar.collapsed .footer-action {
+  justify-content: center;
+}
+
+.sidebar.collapsed .footer-label {
+  display: none;
+}
+
+/* ---------------- Profile ---------------- */
+
 .profile {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-top: 8px;
+  padding-top: 10px;
   border-top: 1px solid var(--border-lighter);
 }
 
 .avatar {
   width: 40px;
   height: 40px;
-  border-radius: 20px;
+  border-radius: 50%;
 }
 
 .profile-meta {
@@ -196,3 +209,15 @@
   color: var(--muted);
   font-size: 18px;
 }
+
+/* Profile collapsed behavior */
+.sidebar.collapsed .profile {
+  justify-content: center;
+}
+
+.sidebar.collapsed .profile-meta,
+.sidebar.collapsed .chev {
+  display: none;
+}
+
+
