@@ -29,8 +29,15 @@ export default function AppLayout() {
       <div
         style={{
           width: chatExpanded ? 350 : 60,
+          display:'flex',
+          flexDirection:'column',
+          flexShrink:0,
           transition: 'width 0.3s',
           borderLeft: '1px solid var(--border-light)',
+          transition: 'width 0.3s ease',
+          paddingLeft: 12,
+          paddingRight: 0,
+          overflowY:'auto'
         }}
       >
         <ChatPanel
