@@ -13,9 +13,16 @@
 .chat-header {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   padding: 12px 0;
   border-bottom: 1px solid var(--border-light);
+}
+
+.chat-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
 }
 
 .chat-header h3 {
@@ -62,6 +69,49 @@
   word-wrap: break-word;
   line-height: 1.4;
 }
+
+.message-content {
+
+}
+
+.message-text {
+
+}
+
+.message-time {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 4px;
+  text-align: right;
+}
+
+.typing-indicator {
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+  margin: 4px 0;
+}
+
+.typing-indicator .dot {
+  animation: blink 1.4s infinite;
+}
+
+.typing-indicator span {
+  /* animation-delay: calc(var(--i) * 0.2s); */
+  width: 4px;
+  height: 4px;
+  background: var(--muted);
+  border-radius: 50%;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+.typing-indicator span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
 
 .chat-message.user {
   background: rgba(10,132,255,0.14);
