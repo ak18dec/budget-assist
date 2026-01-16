@@ -153,7 +153,7 @@ export default function GoalsList(){
         </button>
       </div>
       {showForm && <GoalForm />}
-      <div style={{ marginBottom: 10 }}>
+      <div>
         { items.length === 0 ? (
           <div className="card muted">No goals available.</div>
         ) : (

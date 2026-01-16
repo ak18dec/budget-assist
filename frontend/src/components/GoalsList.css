@@ -4,3 +4,16 @@
   align-items: center;
   margin-bottom: 16px;
 }
+
+.goal-item {
+  /* border: 1px solid #ddd; */
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.goal-item h2 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+}
