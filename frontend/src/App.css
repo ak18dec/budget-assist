@@ -174,7 +174,7 @@ h6 {
 .button.add {
   display: flex;
   align-items: center;
-  gap: 6px;
+  /* gap: 6px; */
   padding: 8px 12px;
 }
 

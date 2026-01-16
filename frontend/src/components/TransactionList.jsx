@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react'
 import axios from 'axios'
 import TransactionForm from './TransactionForm.jsx'
 import RecentTransactions from './RecentTransactions.jsx'
-import { FiPlus } from 'react-icons/fi'
 import './TransactionList.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
