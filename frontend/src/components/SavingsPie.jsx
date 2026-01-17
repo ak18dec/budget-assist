@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react'
+import {useState, useMemo} from 'react'
 import { ResponsiveContainer, PieChart as RCChart, Pie, Cell, Tooltip } from 'recharts'
 import './SavingsPie.css'
 

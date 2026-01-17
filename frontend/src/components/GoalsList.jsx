@@ -1,17 +1,12 @@
-import React, {useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import axios from 'axios'
 import { FiPlus } from 'react-icons/fi'
 import './GoalsList.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
-const DUMMY_GOALS = [
-  {id: 'g1', name: 'Vacation Fund', target_amount: 2000, saved_amount: 500, target_date: '2024-12-31', description: 'Saving for a trip to Hawaii.'},
-  {id: 'g2', name: 'New Laptop', target_amount: 1500, saved_amount: 300, target_date: '2024-06-30', description: 'Upgrading my work laptop.'},
-  {id: 'g3', name: 'Emergency Fund', target_amount: 5000, saved_amount: 1500, target_date: '2025-12-31', description: 'Building an emergency savings fund.'},
-];
 
 export default function GoalsList(){
-  const [items, setItems] = useState([...DUMMY_GOALS])
+  const [items, setItems] = useState([])
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -31,11 +26,11 @@ export default function GoalsList(){
         setItems(data.goals)
       } else {
         console.warn('Unexpected /goals response:', data)
-        setItems([...DUMMY_GOALS])
+        setItems([])
       }
     }catch(err){
       console.error('Failed to load goals', err)
-      setItems([...DUMMY_GOALS])
+      setItems([])
     }
   }
 

@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react'
+import {useMemo, useState} from 'react'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from 'recharts'
 import { FiInfo, FiArrowUp, FiArrowDown } from 'react-icons/fi'
 import './FinancialChart.css'
@@ -45,7 +45,6 @@ function CustomTooltip({active, payload, label}){
         <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', gap:4}}>
           <div>
             <div style={{fontWeight:550}}>{formatMoney(income)}</div>
-            {/* <div className="muted">Income</div> */}
           </div>
           <div style={{textAlign:'left', display:'flex', flexDirection:'row', alignItems:'flex-end', gap:4}}>
             <Delta val={incomeDelta} /><div className="muted" style={{fontSize:12}}>vs last month</div></div>
@@ -57,7 +56,6 @@ function CustomTooltip({active, payload, label}){
         <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', gap:4}}>
           <div>
             <div style={{fontWeight:550}}>{formatMoney(expense)}</div>
-            {/* <div className="muted">Expense</div> */}
           </div>
           <div style={{textAlign:'left', display:'flex', flexDirection:'row', alignItems:'flex-end', gap:4}}>
             <Delta val={expenseDelta} /><div className="muted" style={{fontSize:12}}>vs last month</div></div>

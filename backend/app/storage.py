@@ -12,11 +12,11 @@ transactions: List[Transaction] = [
     Transaction(id=3, amount=1200.0, category="rent", date=date(2025, 12, 1), description="Monthly rent"),
 ]
 budgets: List[Budget] = [
-    Budget(id=1, name="Monthly Groceries", monthly_limit=400.0, alert_threshold=350.0, category="groceries"),
-    Budget(id=2, name="Entertainment Budget", monthly_limit=50.0, alert_threshold=45.0, category="entertainment"),
-    Budget(id=3, name="Transport Budget", monthly_limit=1200.0, alert_threshold=1100.0, category="transport"),
-    Budget(id=4, name="Rent", monthly_limit=1200.0, alert_threshold=1100.0, category="rent"),
-    Budget(id=5, name="Utilities", monthly_limit=120.0, alert_threshold=110.0, category="utilities"),
+    Budget(id=1, name="Monthly Groceries", monthly_limit=400.0, alert_threshold=0.9, category="groceries"),
+    Budget(id=2, name="Entertainment Budget", monthly_limit=50.0, alert_threshold=0.7, category="entertainment"),
+    Budget(id=3, name="Transport Budget", monthly_limit=1200.0, alert_threshold=0.8, category="transport"),
+    Budget(id=4, name="Rent", monthly_limit=1200.0, alert_threshold=1.0, category="rent"),
+    Budget(id=5, name="Utilities", monthly_limit=120.0, alert_threshold=0.7, category="utilities"),
 ]
 goals: List[Goal] = [
     Goal(id=1, name="Emergency Fund", target_amount=1000.0, saved_amount=200.0, target_date=date(2025, 12, 31), description="Emergency fund for unexpected expenses"),

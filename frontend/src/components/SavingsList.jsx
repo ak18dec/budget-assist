@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import { FiActivity, FiGift } from 'react-icons/fi'
 import { GoMortarBoard } from 'react-icons/go'
 import axios from 'axios'

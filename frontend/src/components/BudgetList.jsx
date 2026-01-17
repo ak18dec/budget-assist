@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import axios from 'axios'
 import { FiPlus } from 'react-icons/fi'
 import './BudgetList.css'
@@ -152,20 +152,6 @@ export default function BudgetList() {
   }
 
   return (
-    // <div className='card'>
-    //   <h3>Budget Overview</h3>
-    //   <ul className="transactions-list">
-    //     {items.map(tx=> (
-    //       <li key={tx.id}>
-    //         <div>
-    //           {/* <div style={{fontWeight:600}}>{tx.category}</div> */}
-    //           <div className="muted">{tx.name || ''}</div>
-    //         </div>
-    //         <div style={{fontWeight:700}}>${tx.amount}</div>
-    //       </li>
-    //     ))}
-    //   </ul>
-    // </div>
     <div className='card' style={{ gap: 12, display: 'flex', flexDirection: 'column' }}>
           <div className="budgets-header">
             <h3>Budget Overview</h3>

@@ -1,4 +1,3 @@
-import React from 'react'
 import { FiCreditCard, FiArrowUp, FiArrowDown } from 'react-icons/fi'
 import './SummaryCards.css'
 

@@ -1,7 +1,9 @@
-import React, {useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import axios from 'axios'
 import { FiInfo } from 'react-icons/fi'
 import './RecentTransactions.css'
+
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 const DUMMY = [
   {id: 't1', name: 'Paypal', category: 'Income', account: 'Platinum', date: '2023-08-08T05:02:00Z', amount: 1240.41},
@@ -56,7 +58,7 @@ export default function RecentTransactions(){
             </div>
 
             <div style={{display:'flex', gap:24, alignItems:'center', minWidth:340, justifyContent:'flex-end'}}>
-              <div style={{width:120, textAlign:'left'}} className="muted">{tx.account || '—'}</div>
+              {/* <div style={{width:120, textAlign:'left'}} className="muted">{tx.account || '—'}</div> */}
               <div className="muted" style={{width:140, textAlign:'left'}}>{fmtDate(tx.date)}</div>
               <div style={{width:120, textAlign:'right', fontWeight:500, fontSize:13, color: tx.amount >= 0 ? '#159969' : '#d62929'}}>{fmtMoney(tx.amount)}</div>
             </div>

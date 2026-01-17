@@ -1,4 +1,3 @@
-import React from 'react'
 import { ResponsiveContainer, PieChart as RCChart, Pie, Cell, Tooltip, Legend } from 'recharts'
 import './PieChart.css'
 
