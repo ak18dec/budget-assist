@@ -213,7 +213,7 @@ export default function ChatPanel({ expanded, onToggle }){
                       onClick={send}
                       disabled={loading || !inputText.trim()}
                       aria-label='send'
-                      style={{ marginBottom: radius < 999 ? 4 : 8  }}
+                      style={{ marginBottom: radius < 999 ? 4 : 7  }}
                     >
                       {loading ? <span className="spinner" /> : <FiSend />}
                     </button>
