@@ -12,13 +12,16 @@ transactions: List[Transaction] = [
     Transaction(id=3, amount=1200.0, category="rent", date=date(2025, 12, 1), description="Monthly rent"),
 ]
 budgets: List[Budget] = [
-    Budget(id=1, name="groceries", amount=400.0),
-    Budget(id=2, name="coffee", amount=50.0),
-    Budget(id=3, name="rent", amount=1200.0),
+    Budget(id=1, name="Monthly Groceries", monthly_limit=400.0, alert_threshold=350.0, category="groceries"),
+    Budget(id=2, name="Entertainment Budget", monthly_limit=50.0, alert_threshold=45.0, category="entertainment"),
+    Budget(id=3, name="Transport Budget", monthly_limit=1200.0, alert_threshold=1100.0, category="transport"),
+    Budget(id=4, name="Rent", monthly_limit=1200.0, alert_threshold=1100.0, category="rent"),
+    Budget(id=5, name="Utilities", monthly_limit=120.0, alert_threshold=110.0, category="utilities"),
 ]
 goals: List[Goal] = [
-    Goal(id=1, name="Emergency Fund", target_amount=1000.0, saved_amount=200.0),
-    Goal(id=2, name="Vacation", target_amount=1500.0, saved_amount=300.0),
+    Goal(id=1, name="Emergency Fund", target_amount=1000.0, saved_amount=200.0, target_date=date(2025, 12, 31), description="Emergency fund for unexpected expenses"),
+    Goal(id=2, name="Vacation", target_amount=1500.0, saved_amount=300.0, target_date=date(2026, 6, 30), description="Vacation fund for summer trip"),
+    Goal(id=3, name="New Laptop", target_amount=2000.0, saved_amount=500.0, target_date=date(2026, 3, 31), description="Saving for a new laptop"),
 ]
 
 # keep auto ids in sync with seeded data

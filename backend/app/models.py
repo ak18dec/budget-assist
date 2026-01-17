@@ -16,7 +16,9 @@ class Transaction(TransactionBase):
 
 class BudgetBase(BaseModel):
     name: str
-    amount: float
+    category: str
+    monthly_limit: float
+    alert_threshold: float
 
 class Budget(BudgetBase):
     id: int
@@ -25,6 +27,8 @@ class GoalBase(BaseModel):
     name: str
     target_amount: float
     saved_amount: float = 0.0
+    target_date: Optional[date] = None
+    description: Optional[str] = None
 
 class Goal(GoalBase):
     id: int
