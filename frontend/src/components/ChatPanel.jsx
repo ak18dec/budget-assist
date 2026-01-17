@@ -1,226 +1,242 @@
-import React, { useState, useRef, useEffect } from 'react'
-import axios from 'axios'
-import './ChatPanel.css'
+import React, { useState, useRef, useEffect } from "react";
+import axios from "axios";
+import "./ChatPanel.css";
 import { GoDependabot, GoTrash } from "react-icons/go";
-import { FiSend} from "react-icons/fi";
+import { FiSend } from "react-icons/fi";
 
-const API_URL = import.meta.env.VITE_API_URL || '';
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 const initialMessages = [
-  { 
-    id: 1, 
-    text: 'Welcome! How can I assist you with your finances today?',
-    sender: 'bot',
-    timestamp: new Date()
-  }
+    {
+        id: 1,
+        text: "Welcome! How can I assist you with your finances today?",
+        sender: "bot",
+        timestamp: new Date(),
+    },
 ];
 
-export default function ChatPanel({ expanded, onToggle }){
-  const [inputText, setInputText] = useState('')
-  const [messages, setMessages] = useState([...initialMessages])
-  const [loading, setLoading] = useState(false)
-  const messagesEndRef = useRef(null);
-  const textareaRef = useRef(null);
-  const [radius, setRadius] = useState(999);
+export default function ChatPanel({ expanded, onToggle }) {
+    const [inputText, setInputText] = useState("");
+    const [messages, setMessages] = useState([...initialMessages]);
+    const [loading, setLoading] = useState(false);
+    const messagesEndRef = useRef(null);
+    const textareaRef = useRef(null);
+    const [radius, setRadius] = useState(999);
+    const [botTyping, setBotTyping] = useState(false)
 
-  useEffect(() => {
-    const el = textareaRef.current
-    if (!el) return
+    useEffect(() => {
+        const el = textareaRef.current;
+        if (!el) return;
 
-    // Auto-grow height
-    el.style.height = 'auto'
-    const maxHeight = 160
-    const height = Math.min(el.scrollHeight, maxHeight)
-    el.style.height = height + 'px'
+        // Auto-grow height
+        el.style.height = "auto";
+        const maxHeight = 160;
+        const height = Math.min(el.scrollHeight, maxHeight);
+        el.style.height = height + "px";
 
-    // Line-based calculation (WhatsApp-like)
-    const lineHeight = 20
-    const baseHeight = 44
-    const lines = Math.max(1, Math.round((height - baseHeight) / lineHeight) + 1)
+        // Line-based calculation (WhatsApp-like)
+        const lineHeight = 20;
+        const baseHeight = 44;
+        const lines = Math.max(
+            1,
+            Math.round((height - baseHeight) / lineHeight) + 1
+        );
 
-    // Non-linear radius curve (ease-out)
-    const minRadius = 18
-    const maxRadius = 999
-    const t = Math.min((lines - 1) / 3, 1) // normalize 1–4 lines
-    const eased = 1 - Math.pow(1 - t, 2.5)
+        // Non-linear radius curve (ease-out)
+        const minRadius = 18;
+        const maxRadius = 999;
+        const t = Math.min((lines - 1) / 3, 1); // normalize 1–4 lines
+        const eased = 1 - Math.pow(1 - t, 2.5);
 
-    const newRadius = maxRadius - eased * (maxRadius - minRadius)
+        const newRadius = maxRadius - eased * (maxRadius - minRadius);
 
-    setRadius(newRadius)
-  }, [inputText])
+        setRadius(newRadius);
+    }, [inputText]);
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      send();
+    const handleKeyPress = (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            send();
+        }
+    };
+
+    function handleKeyDown(e) {
+        // Desktop: Enter = send, Shift+Enter = newline
+        if (e.key === "Enter" && !e.shiftKey && !isMobile()) {
+            e.preventDefault();
+            send();
+        }
     }
-  };
 
-  function handleKeyDown(e) {
-    // Desktop: Enter = send, Shift+Enter = newline
-    if (e.key === 'Enter' && !e.shiftKey && !isMobile()) {
-      e.preventDefault()
-      send()
+    const clearChat = () => {
+        setMessages([...initialMessages]);
+    };
+
+    const formatTime = (timestamp) => {
+        return timestamp.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    };
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    function isMobile() {
+        return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     }
-  }
 
-  const clearChat = () => {
-    setMessages([...initialMessages]);
-  }
-
-  const formatTime = (timestamp) => {
-    return timestamp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-  }
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }
-
-  function isMobile() {
-    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-  }
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, expanded]);
-
-  async function send() {
-    if(!inputText.trim() || loading) return;
-
-    const userMessage = {
-      id: messages.length + 1,
-      text: inputText,
-      sender: 'user',
-      timestamp: new Date() 
+    function TypingIndicator() {
+      return (
+        <div className="typing-indicator typing-fade-in">
+          <span />
+          <span />
+          <span />
+        </div>
+      )
     }
-    setMessages(prevMessages => [...prevMessages, userMessage]);
-    setInputText('')
-    setLoading(true)
 
-    try {
-      const res = await axios.post(`${API_URL}/chat/`, { message: userMessage.text });
-      
-      setMessages(prevMessages => [...prevMessages, 
-        { 
-          id: prevMessages.length + 1, 
-          text: res.data.response, 
-          sender: 'bot', 
-          timestamp: new Date() 
-        }])
-    } catch(err) {
-      setMessages(prevMessages => [...prevMessages, { id: prevMessages.length + 1, text: 'Failed to get response', sender: 'bot', timestamp: new Date() }])
-    } finally { 
-      setLoading(false) 
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages, expanded]);
+
+    async function send() {
+        if (!inputText.trim() || loading) return;
+
+        const userMessage = {
+            id: messages.length + 1,
+            text: inputText,
+            sender: "user",
+            timestamp: new Date(),
+        };
+        setMessages((prevMessages) => [...prevMessages, userMessage]);
+        setInputText("");
+        setBotTyping(true)
+        setLoading(true);
+
+        try {
+            const res = await axios.post(`${API_URL}/chat/`, {
+                message: userMessage.text,
+            });
+
+            setMessages((prevMessages) => [
+                ...prevMessages,
+                {
+                    id: prevMessages.length + 1,
+                    text: res.data.response,
+                    sender: "bot",
+                    timestamp: new Date(),
+                },
+            ]);
+        } catch (err) {
+            setMessages((prevMessages) => [
+                ...prevMessages,
+                {
+                    id: prevMessages.length + 1,
+                    text: "Failed to get response",
+                    sender: "bot",
+                    timestamp: new Date(),
+                },
+            ]);
+        } finally {
+            setLoading(false);
+            setBotTyping(false)
+        }
     }
-  }
 
-  return (
-      <div className="chat-panel">
-          <div
-              className="chat-header"
-              style={{ justifyContent: expanded ? "space-between" : "center" }}
-          >
-              <div className="chat-logo">
-                  {expanded && (
-                      <h3 style={{ marginTop: 0, margin: 0 }}>BudgetAI</h3>
-                  )}
-                  <button
-                      className="chat-toggle"
-                      onClick={onToggle}
-                      title={expanded ? "Collapse" : "Expand"}
-                  >
-                      {expanded ? <GoDependabot /> : <GoDependabot />}
-                  </button>
-              </div>
-              <div className="chat-header-clear">
-                  {expanded && (
-                      <button
-                          className="button chat-clear"
-                          onClick={clearChat}
-                          title="Clear Chat"
-                      >
-                          <GoTrash />
-                      </button>
-                  )}
-              </div>
-          </div>
-          {expanded && (
-              <>
-                  <div className="chat-window">
-                      {messages.map((message, i) => (
-                          <div
-                              key={message.id}
-                              className={`chat-message ${
-                                  message.sender === "user" ? "user" : "bot"
-                              }`}
-                          >
-                              <div className="message-content">
-                                  <div className="message-text">
-                                      {message.text}
-                                  </div>
-                                  <div className="message-time">
-                                      {formatTime(message.timestamp)}
-                                  </div>
-                              </div>
-                          </div>
-                      ))}
-                      {loading && (
-                          <div className="chat-message bot loading-message">
-                              <div className="message-content">
-                                  <div className="typing-indicator">
-                                      <span></span>
-                                      <span></span>
-                                      <span></span>
-                                  </div>
-                              </div>
-                          </div>
-                      )}
-
-                      <div ref={messagesEndRef}></div>
-                  </div>
-                  {/* <div className="chat-input-container">
-            <input 
-              className="chat-input" 
-              value={inputText} 
-              onChange={e=>setInputText(e.target.value)} 
-              placeholder="Ask about budgets, spending, goals" 
-              onKeyDown={handleKeyPress} 
-            />
-            <button className="button" onClick={send} disabled={loading}>{loading? '...' : 'Send'}</button>
-          </div> */}
-            <div className="chat-input-container">
-                <div className="chat-input-wrapper">
-                    {/* <input
-                        className="chat-input"
-                        value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
-                        placeholder="Ask about budgets, spending, goals"
-                        onKeyDown={handleKeyPress}
-                    /> */}
-                    <textarea
-                      ref={textareaRef}
-                      className="chat-input"
-                      value={inputText}
-                      onChange={e => setInputText(e.target.value)}
-                      placeholder="Ask about budgets, spending, goals…"
-                      rows={1}
-                      onKeyDown={handleKeyDown}
-                      enterKeyHint="send"
-                      style={{ borderRadius: `${radius}px`}}
-                    />
+    return (
+        <div className="chat-panel">
+            <div
+                className="chat-header"
+                style={{
+                    justifyContent: expanded ? "space-between" : "center",
+                }}
+            >
+                <div className="chat-logo">
+                    {expanded && (
+                        <h3 style={{ marginTop: 0, margin: 0 }}>BudgetAI</h3>
+                    )}
                     <button
-                      className="send-button"
-                      onClick={send}
-                      disabled={loading || !inputText.trim()}
-                      aria-label='send'
-                      style={{ marginBottom: radius < 999 ? 4 : 7  }}
+                        className="chat-toggle"
+                        onClick={onToggle}
+                        title={expanded ? "Collapse" : "Expand"}
                     >
-                      {loading ? <span className="spinner" /> : <FiSend />}
+                        {expanded ? <GoDependabot /> : <GoDependabot />}
                     </button>
                 </div>
+                <div className="chat-header-clear">
+                    {expanded && (
+                        <button
+                            className="button chat-clear"
+                            onClick={clearChat}
+                            title="Clear Chat"
+                        >
+                            <GoTrash />
+                        </button>
+                    )}
+                </div>
             </div>
-          </>
-          )}
-      </div>
-  );
+            {expanded && (
+                <>
+                    <div className="chat-window">
+                        {messages.map((message, i) => (
+                            <div
+                                key={message.id}
+                                className={`chat-message ${
+                                    message.sender === "user" ? "user" : "bot"
+                                }`}
+                            >
+                                <div className="message-content">
+                                    <div className="message-text">
+                                        {message.text}
+                                    </div>
+                                    <div className="message-time">
+                                        {formatTime(message.timestamp)}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+
+                        {botTyping && (
+                          <div className="chat-bubble bot">
+                            <TypingIndicator />
+                          </div>
+                        )}
+
+                        <div ref={messagesEndRef}></div>
+                    </div>
+
+                    <div className="chat-input-container">
+                        <div className="chat-input-wrapper">
+                            <textarea
+                                ref={textareaRef}
+                                className="chat-input"
+                                value={inputText}
+                                onChange={(e) => setInputText(e.target.value)}
+                                placeholder="Ask about budgets, spending, goals…"
+                                rows={1}
+                                onKeyDown={handleKeyDown}
+                                enterKeyHint="send"
+                                style={{ borderRadius: `${radius}px` }}
+                            />
+                            <button
+                                className="send-button"
+                                onClick={send}
+                                disabled={loading || !inputText.trim()}
+                                aria-label="send"
+                                style={{ marginBottom: radius < 999 ? 4 : 7 }}
+                            >
+                                {loading ? (
+                                    <span className="spinner" />
+                                ) : (
+                                    <FiSend />
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
+    );
 }
