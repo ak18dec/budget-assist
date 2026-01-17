@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
 import './ChatPanel.css'
 import { GoDependabot, GoTrash } from "react-icons/go";
-import { FiTrash } from "react-icons/fi";
+import { FiSend} from "react-icons/fi";
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -20,6 +20,34 @@ export default function ChatPanel({ expanded, onToggle }){
   const [messages, setMessages] = useState([...initialMessages])
   const [loading, setLoading] = useState(false)
   const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
+  const [radius, setRadius] = useState(999);
+
+  useEffect(() => {
+    const el = textareaRef.current
+    if (!el) return
+
+    // Auto-grow height
+    el.style.height = 'auto'
+    const maxHeight = 160
+    const height = Math.min(el.scrollHeight, maxHeight)
+    el.style.height = height + 'px'
+
+    // Line-based calculation (WhatsApp-like)
+    const lineHeight = 20
+    const baseHeight = 44
+    const lines = Math.max(1, Math.round((height - baseHeight) / lineHeight) + 1)
+
+    // Non-linear radius curve (ease-out)
+    const minRadius = 18
+    const maxRadius = 999
+    const t = Math.min((lines - 1) / 3, 1) // normalize 1–4 lines
+    const eased = 1 - Math.pow(1 - t, 2.5)
+
+    const newRadius = maxRadius - eased * (maxRadius - minRadius)
+
+    setRadius(newRadius)
+  }, [inputText])
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -27,6 +55,14 @@ export default function ChatPanel({ expanded, onToggle }){
       send();
     }
   };
+
+  function handleKeyDown(e) {
+    // Desktop: Enter = send, Shift+Enter = newline
+    if (e.key === 'Enter' && !e.shiftKey && !isMobile()) {
+      e.preventDefault()
+      send()
+    }
+  }
 
   const clearChat = () => {
     setMessages([...initialMessages]);
@@ -38,6 +74,10 @@ export default function ChatPanel({ expanded, onToggle }){
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function isMobile() {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
   }
 
   useEffect(() => {
@@ -75,65 +115,70 @@ export default function ChatPanel({ expanded, onToggle }){
   }
 
   return (
-    <div className="chat-panel">
-      <div className="chat-header">
-        <div className='chat-logo'>
-          {expanded && <h3 style={{marginTop:0, margin:0}}>BudgetAI</h3>}
-          <button 
-            className="chat-toggle"
-            onClick={onToggle}
-            title={expanded ? 'Collapse' : 'Expand'}
+      <div className="chat-panel">
+          <div
+              className="chat-header"
+              style={{ justifyContent: expanded ? "space-between" : "center" }}
           >
-            {expanded ? <GoDependabot /> : <GoDependabot />}
-          </button>
-        </div>
-        <div className='chat-header-clear'>
-          {expanded && (
-          <button 
-            className="button chat-clear"
-            onClick={clearChat}
-            title="Clear Chat"
-          >
-            <GoTrash />
-          </button>
-        )}
-        </div>
-        
-        
-      </div>
-      {expanded && (
-        <>
-          <div className="chat-window">
-            {messages.map((message,i)=> (
-              <div 
-                key={message.id} 
-                className={`chat-message ${message.sender==='user'? 'user':'bot'}`}>
-                  <div className="message-content">
-                    <div className='message-text'>
-                      {message.text}
-                    </div>
-                    <div className='message-time'>
-                      {formatTime(message.timestamp)}
-                    </div>
-                  </div>
+              <div className="chat-logo">
+                  {expanded && (
+                      <h3 style={{ marginTop: 0, margin: 0 }}>BudgetAI</h3>
+                  )}
+                  <button
+                      className="chat-toggle"
+                      onClick={onToggle}
+                      title={expanded ? "Collapse" : "Expand"}
+                  >
+                      {expanded ? <GoDependabot /> : <GoDependabot />}
+                  </button>
               </div>
-            ))}
-            {loading && (
-              <div className="chat-message bot loading-message">
-                <div className="message-content">
-                  <div className='typing-indicator'>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                </div>
+              <div className="chat-header-clear">
+                  {expanded && (
+                      <button
+                          className="button chat-clear"
+                          onClick={clearChat}
+                          title="Clear Chat"
+                      >
+                          <GoTrash />
+                      </button>
+                  )}
               </div>
-              )
-            }
-
-            <div ref={messagesEndRef}></div>
           </div>
-          <div className="chat-input-container">
+          {expanded && (
+              <>
+                  <div className="chat-window">
+                      {messages.map((message, i) => (
+                          <div
+                              key={message.id}
+                              className={`chat-message ${
+                                  message.sender === "user" ? "user" : "bot"
+                              }`}
+                          >
+                              <div className="message-content">
+                                  <div className="message-text">
+                                      {message.text}
+                                  </div>
+                                  <div className="message-time">
+                                      {formatTime(message.timestamp)}
+                                  </div>
+                              </div>
+                          </div>
+                      ))}
+                      {loading && (
+                          <div className="chat-message bot loading-message">
+                              <div className="message-content">
+                                  <div className="typing-indicator">
+                                      <span></span>
+                                      <span></span>
+                                      <span></span>
+                                  </div>
+                              </div>
+                          </div>
+                      )}
+
+                      <div ref={messagesEndRef}></div>
+                  </div>
+                  {/* <div className="chat-input-container">
             <input 
               className="chat-input" 
               value={inputText} 
@@ -142,9 +187,40 @@ export default function ChatPanel({ expanded, onToggle }){
               onKeyDown={handleKeyPress} 
             />
             <button className="button" onClick={send} disabled={loading}>{loading? '...' : 'Send'}</button>
-          </div>
-        </>
-      )}
-    </div>
-  )
+          </div> */}
+            <div className="chat-input-container">
+                <div className="chat-input-wrapper">
+                    {/* <input
+                        className="chat-input"
+                        value={inputText}
+                        onChange={(e) => setInputText(e.target.value)}
+                        placeholder="Ask about budgets, spending, goals"
+                        onKeyDown={handleKeyPress}
+                    /> */}
+                    <textarea
+                      ref={textareaRef}
+                      className="chat-input"
+                      value={inputText}
+                      onChange={e => setInputText(e.target.value)}
+                      placeholder="Ask about budgets, spending, goals…"
+                      rows={1}
+                      onKeyDown={handleKeyDown}
+                      enterKeyHint="send"
+                      style={{ borderRadius: `${radius}px`}}
+                    />
+                    <button
+                      className="send-button"
+                      onClick={send}
+                      disabled={loading || !inputText.trim()}
+                      aria-label='send'
+                      style={{ marginBottom: radius < 999 ? 4 : 8  }}
+                    >
+                      {loading ? <span className="spinner" /> : <FiSend />}
+                    </button>
+                </div>
+            </div>
+          </>
+          )}
+      </div>
+  );
 }

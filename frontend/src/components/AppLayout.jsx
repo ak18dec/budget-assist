@@ -5,7 +5,7 @@ import Topbar from '../components/Topbar'
 import ChatPanel from '../components/ChatPanel'
 
 export default function AppLayout() {
-  const [chatExpanded, setChatExpanded] = React.useState(false)
+  const [chatExpanded, setChatExpanded] = React.useState(true)
   const [sidebarExpanded, setSidebarExpanded] = React.useState(true)
 
   return (
