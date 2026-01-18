@@ -8,6 +8,7 @@ const API_URL = import.meta.env.VITE_API_URL || '';
 
 export default function TransactionList(){
   const [items, setItems] = useState([])
+  const [filter, setFilter] = useState('ALL')
 
   async function load(){
     try{
@@ -27,6 +28,8 @@ export default function TransactionList(){
     return ()=> window.removeEventListener('transactions:changed', load)
   }, [])
 
+  const visibleItems = filter === 'ALL' ? items : items.filter(tx => tx.type === filter)
+  
   return (
     <div className="card transaction-wrapper">
       <div className="transactions-header">
@@ -41,14 +44,24 @@ export default function TransactionList(){
         )}
 
         {items.length > 0 && (
+          <>
           <div className="transaction-row header grid-3">
             <div>Category</div>
             <div className="tx-date">Date</div>
             <div className="tx-amount" style={{fontWeight: 500}}>Amount</div>
           </div>
-        )}
-
-        {items.map(tx => (
+          <div className="tx-filters">
+            {['ALL', 'INCOME', 'EXPENSE'].map(t => (
+              <button
+                key={t}
+                className={`tx-filter ${filter === t ? 'active' : ''}`}
+                onClick={() => setFilter(t)}
+              >
+                {capitalize(t)}
+              </button>
+            ))}
+          </div>
+          {visibleItems.map(tx => (
           <div key={tx.id} className="transaction-row grid-3">
             {/* Left */}
             <div className="tx-left">
@@ -75,6 +88,8 @@ export default function TransactionList(){
             </div>
           </div>
         ))}
+          </>
+        )}
       </div>
     </div>
   )
