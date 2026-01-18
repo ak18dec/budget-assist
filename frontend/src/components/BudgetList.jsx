@@ -80,7 +80,7 @@ export default function BudgetList() {
         <h2 className='muted'>Add Budget</h2>
         <div className="form-row">
           <input
-            className='form-input'
+            className='form-input budget-name'
             type="text"
             name="name"
             placeholder="Budget Name"
@@ -89,7 +89,7 @@ export default function BudgetList() {
             required
           />
           <select
-            className='form-input'
+            className='form-input budget-category'
             name="category"
             value={formData.category}
             onChange={handleFormChange}
@@ -101,7 +101,7 @@ export default function BudgetList() {
             ))}
           </select>
           <input
-            className='form-input'
+            className='form-input budget-monthly-limit'
             type="number"
             step="0.01"
             name="monthly_limit"
@@ -111,7 +111,7 @@ export default function BudgetList() {
             required
           />
           <input
-            className='form-input'
+            className='form-input budget-alert-threshold'
             type="number"
             step="0.01"
             name="alert_threshold"
@@ -120,7 +120,7 @@ export default function BudgetList() {
             onChange={handleFormChange}
             required
           />
-          <button className="button" type="submit">Add Budget</button>
+          <button className="button add-budget-btn" type="submit">Add Budget</button>
         </div>
       </form>
     );

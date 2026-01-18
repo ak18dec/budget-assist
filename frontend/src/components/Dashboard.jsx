@@ -15,7 +15,12 @@ export default function DashboardPage() {
         <div className="card">
           <FinancialChart />
         </div>
-        <div className="card">{/* PieChart later */}</div>
+        <div className="card">
+          <h3 style={{ fontWeight: 500 }}>
+            Savings <FiInfo size={15} />
+          </h3>
+          <SavingsList />
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12, marginTop: 12 }}>
@@ -23,12 +28,12 @@ export default function DashboardPage() {
           <RecentTransactions />
         </div>
 
-        <div className="card">
+        {/* <div className="card">
           <h3 style={{ fontWeight: 500 }}>
             Savings <FiInfo size={15} />
           </h3>
           <SavingsList />
-        </div>
+        </div> */}
       </div>
     </>
   )

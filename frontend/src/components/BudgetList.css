@@ -4,3 +4,9 @@
   align-items: center;
   margin-bottom: 16px;
 }
+
+.form-input.budget-name { flex: 35; }
+.form-input.budget-category { flex: 20; }
+.form-input.budget-monthly-limit { flex: 15; }
+.form-input.budget-alert-threshold { flex: 10; }
+.add-budget-btn { flex: 20; }
