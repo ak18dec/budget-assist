@@ -2,15 +2,13 @@ import {useEffect, useState} from 'react'
 import axios from 'axios'
 import { FiPlus } from 'react-icons/fi'
 import './BudgetList.css'
+import { fmtCurrency } from '../utils/Formatters.js'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
-const DUMMY_BUDGETS = [
-  {id: 'b1', name: 'Monthly Groceries', category: 'Food', monthly_limit: 500, alert_threshold: 0.8},
-  {id: 'b2', name: 'Entertainment Budget', category: 'Entertainment', monthly_limit: 200, alert_threshold: 0.75},
-  {id: 'b3', name: 'Transport Budget', category: 'Transportation', monthly_limit: 150, alert_threshold: 0.9},
-];
+
 export default function BudgetList() {
-  const [items, setItems] = useState([...DUMMY_BUDGETS]);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -19,10 +17,11 @@ export default function BudgetList() {
     alert_threshold: 0.8
   });
 
-  const categories = ['Housing', 'Food', 'Transportation', 'Entertainment', 'Utilities', 'Healthcare', 'Savings', 'Miscellaneous'];
+  const categories = ['Housing', 'Food', 'Transportation', 'Entertainment', 'Utilities', 'Healthcare', 'Savings', 'Miscellaneous', 'Groceries', 'Education' , 'Shopping', 'Dininig'];
 
   async function fetchBudgets(){
     try{
+      setLoading(true);
       const res = await axios.get(`${API_URL}/budgets/`)
       const data = res.data
       if (Array.isArray(data)) {
@@ -31,11 +30,13 @@ export default function BudgetList() {
         setItems(data.budgets)
       } else {
         console.warn('Unexpected /budgets response:', data)
-        setItems([...DUMMY_BUDGETS])
+        setItems([])
       }
     }catch(err){
       console.error('Failed to load budgets', err)
-      setItems([...DUMMY_BUDGETS])
+      setItems([])
+    }finally{
+      setLoading(false);
     }
   }
 
@@ -73,6 +74,35 @@ export default function BudgetList() {
       alert('Failed to add budget');
     }
   };
+
+  const getProgressColor = (percentage) => {
+    if (percentage >= 1) return 'red';
+    if (percentage >= 0.8) return 'orange';
+    if (percentage >= 0.6) return 'yellow';
+    return 'green';
+  }
+
+  const getCategeoryIcon = (category) => {
+    switch(category){
+      case 'Housing': return '🏠';
+      case 'Food': return '🍽️';
+      case 'Transportation': return '🚗';
+      case 'Entertainment': return '🎬';
+      case 'Utilities': return '💡';
+      case 'Healthcare': return '🏥';
+      case 'Savings': return '💰';
+      case 'Miscellaneous': return '📦';
+      case 'Groceries': return '🛒';
+      case 'Education' : return '🎓';
+      case 'Shopping' : return '🛍️';
+      case 'Dining' : return '🍽️';
+      default: return '💼';
+    }
+  }
+
+  if(loading) {
+    return <div className='card'>Loading budgets...</div> 
+  }
 
   function BudgetForm() {
     return (
@@ -126,28 +156,50 @@ export default function BudgetList() {
     );
   }
 
+  function BudgetCard({budget}) {
+    return (
+      <div className="card budget-card">
+        <div className="budget-header">
+          <div className="budget-icon">{getCategeoryIcon(budget.category)}</div>
+          <div className="budget-title">
+            <h3 className="budget-name">{budget.name}</h3>
+            <p className='budget-limit'>Limit: {fmtCurrency(budget.monthly_limit)}</p>
+          </div>
+          {budget.is_over_threshold && (
+            <div className="budget-alert">⚠️ Over Alert Threshold</div>
+          )}
+        </div>
+        <div className="budget-progress">
+          <div className='progress-bar'>
+            <div className="progress-fill" 
+              style={{ 
+                width: `${Math.min(budget.budget_used_percentage * 100, 100)}%`, 
+                backgroundColor: getProgressColor(budget.budget_used_percentage) 
+              }} 
+            ></div>
+            <div className="progress-text">
+              {(budget.budget_used_percentage * 100).toFixed(1)}% used
+            </div>
+          </div>
+        </div>
+        <div className='budget-amounts'>
+          <div className="amount-item">
+            <span className="amount-label">Spent:</span> {fmtCurrency(budget.spent_this_month)}</div>
+          <div className="amount-item">
+            <span className="amount-label">Remaining:</span> {fmtCurrency(budget.remaining_budget)}</div>  
+        </div>
+        <div className={`budget-warning ${budget.is_over_threshold ? 'visible' : ''}`}>
+          ⚠️ You have exceeded your alert threshold of {(budget.alert_threshold * 100).toFixed(0)}%!
+        </div>
+      </div>
+    );
+  }
+
   function SavedBudgets() {
     return (
-      <table style={{width: '100%', borderCollapse: 'collapse'}}>
-        <thead>
-          <tr>
-            <th style={{textAlign: 'left', padding: '8px', borderBottom: '1px solid #e2e8f0'}}>Name</th>
-            <th style={{textAlign: 'left', padding: '8px', borderBottom: '1px solid #e2e8f0'}}>Category</th>
-            <th style={{textAlign: 'right', padding: '8px', borderBottom: '1px solid #e2e8f0'}}>Monthly Limit</th>
-            <th style={{textAlign: 'right', padding: '8px', borderBottom: '1px solid #e2e8f0'}}>Alert Threshold</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map(budget => (
-            <tr key={budget.id} style={{ fontSize: 14 }}>
-              <td style={{padding: '8px', borderBottom: '1px solid #f1f5f9'}}>{budget.name}</td>
-              <td style={{padding: '8px', borderBottom: '1px solid #f1f5f9'}}>{budget.category}</td>
-              <td style={{padding: '8px', borderBottom: '1px solid #f1f5f9', textAlign: 'right'}}>${budget.monthly_limit.toFixed(2)}</td>
-              <td style={{padding: '8px', borderBottom: '1px solid #f1f5f9', textAlign: 'right'}}>{(budget.alert_threshold * 100).toFixed(0)}%</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="saved-budgets">
+      {items.map(budget => (<BudgetCard key={budget.id} budget={budget} />))}
+      </div>
     );
   }
 
@@ -160,9 +212,9 @@ export default function BudgetList() {
             </button>
           </div>
           {showForm && <BudgetForm  onSuccess={fetchBudgets} />}
-          <div className="card">
+          <div>
             { items.length === 0 ? (
-              <div className="muted">No budgets available.</div>
+              <div className="card muted">No budgets set up yet. Create your first budget above!</div>
             ) : (
               <SavedBudgets />
             ) }
