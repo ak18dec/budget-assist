@@ -1,6 +1,10 @@
+import {useEffect, useState} from 'react'
+import axios from 'axios'
 import { FiCreditCard, FiArrowUp, FiArrowDown } from 'react-icons/fi'
 import { fmtCurrency } from '../utils/Formatters.js'
 import './SummaryCards.css'
+
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 function Sparkline({points = [], color = '#10b981'}){
   const w = 120, h = 40
@@ -40,16 +44,37 @@ const SummaryCard = ({title, value, delta, positive=true, color, points}) => (
   </div>
 )
 
-export default function SummaryCards({summary}){
-  const total = fmtCurrency(summary?.total_balance || 30192.98)
-  const income = fmtCurrency(summary?.income || 40000)
-  const expense = fmtCurrency(summary?.expense || 9807.02)
+export default function SummaryCards(){
+  const [summary, setSummary] = useState({})
+
+  async function fetchSummary(){
+    try{
+      const res = await axios.get(`${API_URL}/summary/`)
+      const data = res.data
+      if (data) {
+        setSummary(data)
+      } else if (data?.summary) { 
+        setSummary(data.summary)
+      } else {
+        console.warn('Unexpected /summary response:', data)
+        setSummary({})
+      }
+    }catch{
+      setSummary({})
+    }finally{
+    }
+  }
+
+  useEffect(()=>{
+    fetchSummary();
+  }, [])
+  
 
   return (
     <div style={{display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12}}>
-      <SummaryCard title="Total Balance" value={total} delta="+5%" positive={true} color="#10b981" points={[100,140,120,160,200,180,240]} />
-      <SummaryCard title="Income" value={income} delta="-3%" positive={false} color="#ef4444" points={[80,120,160,140,130,150,120]} />
-      <SummaryCard title="Expense" value={expense} delta="+2%" positive={true} color="#10b981" points={[60,70,90,110,120,130,140]} />
+      <SummaryCard title="Total Balance" value={fmtCurrency(summary.total_balance || 0.00)} delta="+5%" positive={true} color="#10b981" points={[100,140,120,160,200,180,240]} />
+      <SummaryCard title="Income" value={fmtCurrency(summary.total_income || 0.00)} delta="-3%" positive={false} color="#ef4444" points={[80,120,160,140,130,150,120]} />
+      <SummaryCard title="Expense" value={fmtCurrency(summary.total_expense || 0.00)} delta="+2%" positive={true} color="#10b981" points={[60,70,90,110,120,130,140]} />
     </div>
   )
 }

@@ -1,6 +1,6 @@
 from typing import List, Dict
 from datetime import date
-from app.models import Transaction, Budget, Goal, FinancialSummary
+from app.models import Transaction, Budget, Goal, FinancialSummary, TransactionType
 
 _tx_auto_id = 1
 _budget_auto_id = 1
@@ -63,13 +63,25 @@ def list_goals() -> List[Goal]:
     return list(goals)
 
 def get_financial_summary() -> FinancialSummary:
-    total_spent = sum(tx.amount for tx in transactions)
+    total_income = sum(
+        tx.amount for tx in transactions if tx.type == TransactionType.INCOME
+    )
+
+    total_expense = sum(
+        abs(tx.amount) for tx in transactions if tx.type == TransactionType.EXPENSE
+    )
+
+    total_balance = total_income - total_expense
+
     return FinancialSummary(
-        total_spent=total_spent,
+        total_balance=total_balance,
+        total_income=total_income,
+        total_expense=total_expense,
         transactions_count=len(transactions),
         budgets=list(budgets),
         goals=list(goals),
     )
+
 def update_goal(goal_id: int, goal_data) -> Goal:
     for idx, g in enumerate(goals):
         if g.id == goal_id:

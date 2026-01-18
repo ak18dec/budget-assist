@@ -4,8 +4,8 @@ from typing import Optional, List
 from datetime import date
 
 class TransactionType(str, Enum):
-    expense = 'EXPENSE'
-    income = 'INCOME'
+    EXPENSE = 'EXPENSE'
+    INCOME = 'INCOME'
 
 class TransactionBase(BaseModel):
     amount: float
@@ -68,7 +68,9 @@ class Goal(GoalBase):
     id: int
 
 class FinancialSummary(BaseModel):
-    total_spent: float
+    total_balance: float
+    total_income: float
+    total_expense: float
     transactions_count: int
     budgets: List[Budget]
     goals: List[Goal]
