@@ -3,6 +3,7 @@ import { FiActivity, FiGift } from 'react-icons/fi'
 import { GoMortarBoard } from 'react-icons/go'
 import { IoCarOutline } from "react-icons/io5";
 import axios from 'axios'
+import { fmtCurrency } from '../utils/Formatters.js'
 import './SavingsList.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
@@ -21,10 +22,6 @@ const goalIcons = {
 }
 
 function pct(g){ return Math.round((g.saved_amount / g.target_amount)*100) }
-
-function formatAmount(a){
-  return '$' + a.toLocaleString(undefined, {minimumFractionDigits:2})
-}
 
 export default function SavingsList(){
   const [goals, setGoals] = useState([]);
@@ -61,7 +58,7 @@ export default function SavingsList(){
             <div style={{flex:1}}>
               <div style={{fontWeight:500}}>{g.name}</div>
               <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                <div className="muted">{formatAmount(g.saved_amount)} / {formatAmount(g.target_amount)}</div>
+                <div className="muted">{fmtCurrency(g.saved_amount)} / {fmtCurrency(g.target_amount)}</div>
                 <div style={{ fontSize: 13}}>{pct(g)}%</div>
               </div>
               <div style={{height:5, background:'var(--card)', borderRadius:8, marginTop:8}}>

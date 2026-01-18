@@ -1,4 +1,5 @@
 import { FiCreditCard, FiArrowUp, FiArrowDown } from 'react-icons/fi'
+import { fmtCurrency } from '../utils/Formatters.js'
 import './SummaryCards.css'
 
 function Sparkline({points = [], color = '#10b981'}){
@@ -40,9 +41,9 @@ const SummaryCard = ({title, value, delta, positive=true, color, points}) => (
 )
 
 export default function SummaryCards({summary}){
-  const total = `$${(summary?.total_balance || 30192.98).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})}`
-  const income = `$${(summary?.income || 40000).toLocaleString()}.00`
-  const expense = `$${(summary?.expense || 9807.02).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})}`
+  const total = fmtCurrency(summary?.total_balance || 30192.98)
+  const income = fmtCurrency(summary?.income || 40000)
+  const expense = fmtCurrency(summary?.expense || 9807.02)
 
   return (
     <div style={{display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12}}>

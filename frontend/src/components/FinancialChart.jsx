@@ -1,6 +1,7 @@
 import {useMemo, useState} from 'react'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from 'recharts'
 import { FiInfo, FiArrowUp, FiArrowDown } from 'react-icons/fi'
+import { fmtCurrency } from '../utils/Formatters.js'
 import './FinancialChart.css'
 
 const sampleData = [
@@ -18,8 +19,12 @@ const sampleData = [
   { month: 'Dec', income: 12000, expense: 8000 },
 ]
 
-function formatMoney(n){
-  return `$${Number(n).toLocaleString(undefined,{maximumFractionDigits:0})}`
+// function formatMoney(n){
+//   return `$${Number(n).toLocaleString(undefined,{maximumFractionDigits:0})}`
+// }
+
+function YAxisFormatter(value){
+  return `₹${(value/1000).toFixed(0)}K`
 }
 
 function CustomTooltip({active, payload, label}){
@@ -44,7 +49,7 @@ function CustomTooltip({active, payload, label}){
         <div style={{width:4, height:40, backgroundColor:'var(--accent)', borderRadius:5}}></div>
         <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', gap:4}}>
           <div>
-            <div style={{fontWeight:550}}>{formatMoney(income)}</div>
+            <div style={{fontWeight:550}}>{fmtCurrency(income)}</div>
           </div>
           <div style={{textAlign:'left', display:'flex', flexDirection:'row', alignItems:'flex-end', gap:4}}>
             <Delta val={incomeDelta} /><div className="muted" style={{fontSize:12}}>vs last month</div></div>
@@ -55,7 +60,7 @@ function CustomTooltip({active, payload, label}){
         <div style={{width:4, height:40, backgroundColor:'var(--muted-blue)', borderRadius:5}}></div>
         <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', gap:4}}>
           <div>
-            <div style={{fontWeight:550}}>{formatMoney(expense)}</div>
+            <div style={{fontWeight:550}}>{fmtCurrency(expense)}</div>
           </div>
           <div style={{textAlign:'left', display:'flex', flexDirection:'row', alignItems:'flex-end', gap:4}}>
             <Delta val={expenseDelta} /><div className="muted" style={{fontSize:12}}>vs last month</div></div>
@@ -109,7 +114,8 @@ export default function FinancialChart({data}){
               axisLine={{ stroke: 'var(--border-lighter)', strokeWidth: 1 }}
               tickLine={false}
             />
-            <YAxis axisLine={false} tickLine={false} tick={{fill:'var(--muted)', fontSize:12}} tickFormatter={v => `$${(v/1000).toFixed(0)}K`} />
+            <YAxis axisLine={false} tickLine={false} tick={{fill:'var(--muted)', fontSize:12}} 
+            tickFormatter={v => YAxisFormatter(v)} />
             <Tooltip content={<CustomTooltip/>} />
             <Bar dataKey="income" barSize={18} radius={[3,3,0,0]} onClick={handleBarClick}>
               {withDelta.map((entry, idx) => (
