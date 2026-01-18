@@ -187,7 +187,8 @@ h6 {
 
 .form-row input[type='text'],
 .form-row input[type='date'],
-.form-row input[type='number'] {
+.form-row input[type='number'],
+textarea {
   padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid var(--border-light);

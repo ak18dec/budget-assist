@@ -1,9 +1,156 @@
 import {useEffect, useState} from 'react'
 import axios from 'axios'
-import { FiPlus } from 'react-icons/fi'
+import { FiPlus, FiEdit, FiX, FiCheck } from 'react-icons/fi'
 import './GoalsList.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
+
+function GoalItem({ goal, onUpdate }) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [editData, setEditData] = useState({ ...goal })
+
+  useEffect(() => {
+  if (!isEditing) return
+
+  function handleEsc(e) {
+    if (e.key === 'Escape') {
+      setEditData({ ...goal }) // revert
+      setIsEditing(false)
+    }
+  }
+
+  window.addEventListener('keydown', handleEsc)
+  return () => window.removeEventListener('keydown', handleEsc)
+}, [isEditing, goal])
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setEditData(prev => ({
+      ...prev,
+      [name]: name.includes('amount') ? Number(value) || 0 : value
+    }))
+  }
+
+  const handleSave = async () => {
+    try {
+      await axios.put(`${API_URL}/goals/${goal.id}/`, editData)
+      setIsEditing(false)
+      onUpdate()
+    } catch (err) {
+      console.error('Failed to update goal', err)
+    }
+  }
+
+  return (
+    <div className={`card goal-item ${isEditing ? 'editing' : ''}`} style={{ position: 'relative' }}>
+      <button className="edit-toggle-btn" onClick={() => setIsEditing(!isEditing)}>
+        {isEditing ? <FiX /> : <FiEdit />}
+      </button>
+
+      <div className="goal-content">
+        {isEditing ? (
+          <input
+            className="form-input goal-title-input"
+            name="name"
+            value={editData.name}
+            onChange={handleChange}
+          />
+        ) : (
+          <h2 className="goal-title">{goal.name}</h2>
+        )}
+
+        {/* Grid (same for both modes) */}
+        <div className="goal-grid">
+          <div>
+            <strong>Target: </strong>
+            {isEditing ? (
+              <input
+                type="number"
+                name="target_amount"
+                value={editData.target_amount}
+                onChange={handleChange}
+                className="inline-input"
+              />
+            ) : (
+              <span>${goal.target_amount}</span>
+            )}
+          </div>
+
+          <div>
+            <strong>Saved: </strong>
+            {isEditing ? (
+              <input
+                type="number"
+                name="saved_amount"
+                value={editData.saved_amount}
+                onChange={handleChange}
+                className="inline-input"
+              />
+            ) : (
+              <span>${goal.saved_amount}</span>
+            )}
+          </div>
+
+          <div>
+            <strong>Date: </strong>
+            {isEditing ? (
+              <input
+                type="date"
+                name="target_date"
+                value={editData.target_date}
+                onChange={handleChange}
+                className="inline-input"
+              />
+            ) : (
+              <span>{goal.target_date}</span>
+            )}
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="goal-progress">
+          <div
+            className="goal-progress-fill"
+            style={{
+              width: `${Math.min(
+                100,
+                Math.round((goal.saved_amount / goal.target_amount) * 100)
+              )}%`
+            }}
+          />
+        </div>
+
+        <div className="goal-progress-text muted">
+          {Math.round((goal.saved_amount / goal.target_amount) * 100)}% achieved
+        </div>
+
+        {/* Description */}
+        {isEditing ? (
+          <textarea
+            className="goal-description-input"
+            name="description"
+            value={editData.description}
+            onChange={handleChange}
+          />
+        ) : (
+          <p className="muted goal-description">{goal.description}</p>
+        )}
+      </div>
+
+      
+
+      {/* Save Button */}
+      {isEditing && (
+        <div className="goal-actions">
+          <button className="button save-btn" onClick={handleSave}>
+            <FiCheck size={14} /> Save
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 
 export default function GoalsList(){
   const [items, setItems] = useState([])
@@ -123,17 +270,20 @@ export default function GoalsList(){
     );
   }
 
+
+
   function SavedGoals() {
     return (
       <div className="saved-goals-list" style={{ display:'flex', flexDirection:'column', gap:6 }}>
         {items.map(goal => (
-          <div key={goal.id} className="card goal-item">
-            <h2>{goal.name}</h2>
-            <p>Target Amount: ${goal.target_amount}</p>
-            <p>Saved Amount: ${goal.saved_amount}</p>
-            <p>Target Date: {goal.target_date}</p>
-            <p>{goal.description}</p>
-          </div>
+          // <div key={goal.id} className="card goal-item">
+          //   <h2>{goal.name}</h2>
+          //   <p>Target Amount: ${goal.target_amount}</p>
+          //   <p>Saved Amount: ${goal.saved_amount}</p>
+          //   <p>Target Date: {goal.target_date}</p>
+          //   <p>{goal.description}</p>
+          // </div>
+          <GoalItem key={goal.id} goal={goal} onUpdate={fetchGoals} />
         ))}
       </div>
     );

@@ -12,7 +12,120 @@
   font-size: 14px;
 }
 
+.goal-content {
+  padding-bottom: 42px;
+}
+
+.goal-actions {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
 .goal-item h2 {
   margin: 0 0 8px 0;
   font-size: 18px;
+}
+
+.goal-item {
+  padding: 14px;
+}
+
+.edit-toggle-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+}
+
+.goal-title {
+  margin: 0 32px 8px 0;
+}
+
+.goal-title-input {
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  width: 95%;
+  margin-bottom: 8px;
+  height: 33px;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.goal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.inline-input {
+  border: none;
+  border-bottom: 1px dashed #ccc;
+  border-radius: 8px;
+  margin-left: 6px;
+  width: 150px;
+  height: 33px;
+  padding: 8px 10px;
+  font-family: var(--font-family);
+}
+
+.goal-description {
+  margin-top: 8px;
+}
+
+.goal-description-input {
+  border: none;
+  width: 95%;
+  border-radius: 8px;
+  padding: 6px;
+  margin-top: 8px;
+}
+
+.save-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.save-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.goal-progress {
+  margin-top: 8px;
+  height: 6px;
+  background: #eee;
+  border-radius: 6px;
+  overflow: hidden;
+  width: 95%;
+}
+
+.goal-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #81c784);
+  transition: width 200ms ease;
+}
+
+.goal-progress-text {
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+
+.goal-item.editing {
+  background: linear-gradient(
+    0deg,
+    rgba(0, 123, 255, 0.04),
+    rgba(0, 123, 255, 0.04)
+  );
+  border-color: rgba(0, 123, 255, 0.2);
 }
