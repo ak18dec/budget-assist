@@ -40,6 +40,14 @@ export default function TransactionList(){
           <div className="muted empty-state">No transactions yet</div>
         )}
 
+        {items.length > 0 && (
+          <div className="transaction-row header grid-3">
+            <div>Category</div>
+            <div className="tx-date">Date</div>
+            <div className="tx-amount" style={{fontWeight: 500}}>Amount</div>
+          </div>
+        )}
+
         {items.map(tx => (
           <div key={tx.id} className="transaction-row grid-3">
             {/* Left */}
