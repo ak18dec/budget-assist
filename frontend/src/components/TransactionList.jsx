@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react'
 import axios from 'axios'
 import TransactionForm from './TransactionForm.jsx'
-import { fmtDate, fmtMoney } from '../utils/Formatters.js'
+import { fmtDateTime, fmtCurrency, capitalize } from '../utils/Formatters.js'
 import './TransactionList.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
@@ -13,16 +13,10 @@ export default function TransactionList(){
     try{
       const res = await axios.get(`${API_URL}/transactions/`)
       const data = res.data
-      if (Array.isArray(data)) {
-        setItems(data)
-      } else if (data && Array.isArray(data.transactions)) {
-        setItems(data.transactions)
-      } else {
-        console.warn('Unexpected /transactions response:', data)
-        setItems([])
-      }
-    }catch(err){
-      console.error('Failed to load transactions', err)
+      if (Array.isArray(data)) setItems(data)
+      else if (data?.transactions) setItems(data.transactions)
+      else setItems([])
+    }catch{
       setItems([])
     }
   }
@@ -34,23 +28,41 @@ export default function TransactionList(){
   }, [])
 
   return (
-    <div className='card' style={{ gap: 12, display: 'flex', flexDirection: 'column' }}>
+    <div className="card transaction-wrapper">
       <div className="transactions-header">
         <h3>Transactions</h3>
       </div>
-      <TransactionForm /> 
-      <div className="card">
-        <ul className="transactions-list">
-        {items.map(tx=> (
-          <li key={tx.id}>
-            <div>
-              <div style={{fontWeight:600}}>{tx.category}</div>
-              <div className="muted">{fmtDate(tx.date)} — {tx.description || ''}</div>
+
+      <TransactionForm />
+
+      <div className="card transaction-list">
+        {items.length === 0 && (
+          <div className="muted empty-state">No transactions yet</div>
+        )}
+
+        {items.map(tx => (
+          <div key={tx.id} className="transaction-row">
+            {/* Left */}
+            <div className="tx-left">
+              <div className="tx-avatar">
+                {(tx.category || '?').slice(0,1)}
+              </div>
+              <div>
+                <div className="tx-title">{capitalize(tx.category)}</div>
+                <div className="tx-sub muted">
+                  {fmtDateTime(tx.date)} {tx.description ? `— ${tx.description}` : ''}
+                </div>
+              </div>
             </div>
-            <div style={{fontWeight:700}}>{fmtMoney(tx.amount)}</div>
-          </li>
+
+            {/* Right */}
+            <div
+              className={`tx-amount ${tx.type === 'EXPENSE' ? 'expense' : 'income'}`}
+            >
+              {fmtCurrency(tx.amount)}
+            </div>
+          </div>
         ))}
-      </ul>
       </div>
     </div>
   )

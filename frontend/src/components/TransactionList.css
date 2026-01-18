@@ -64,3 +64,81 @@
   font-weight: 600;
   white-space: nowrap;
 }
+
+.transaction-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.transaction-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 10px 6px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.transaction-row:last-child {
+  border-bottom: none;
+}
+
+/* Left side */
+.tx-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tx-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 500;
+  color: #334155;
+}
+
+.tx-title {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.tx-sub {
+  font-size: 12px;
+}
+
+/* Right side */
+.tx-amount {
+  font-weight: 600;
+  font-size: 13px;
+  min-width: 120px;
+  text-align: right;
+}
+
+.tx-amount.income {
+  color: #159969;
+}
+
+.tx-amount.expense {
+  color: #d62929;
+}
+
+/* Empty */
+.empty-state {
+  padding: 12px;
+  text-align: center;
+}

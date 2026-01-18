@@ -14,7 +14,14 @@ export default function TransactionForm(){
   async function submit(e){
     e.preventDefault()
     try{
-      await axios.post(`${API_URL}/transactions/`, {amount: parseFloat(amount), category, description, date})
+      await axios.post(`${API_URL}/transactions/`, 
+        { 
+          amount: parseFloat(amount), 
+          category, 
+          description, 
+          date, 
+          type
+        })
       setType('EXPENSE'); setAmount(''); setCategory(''); setDescription(''); setDate('')
       window.dispatchEvent(new Event('transactions:changed'))
     }catch(err){

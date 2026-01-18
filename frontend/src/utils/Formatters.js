@@ -13,12 +13,13 @@ export function fmtTime(iso){
   catch(e){ return iso }
 }
 
-export function fmtMoney(n){
-  const sign = n >= 0 ? '+' : '-'
-  return sign + ' $' + Math.abs(n).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
+export function fmtCurrency(amount) {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR'
+  }).format(amount)
 }
 
-export function fmtCurrency(amount){
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)
+export function capitalize(s) {
+  return s ? s[0].toUpperCase() + s.slice(1) : '';
 }
-

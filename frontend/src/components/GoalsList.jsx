@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react'
 import axios from 'axios'
 import { FiPlus, FiEdit, FiX, FiCheck } from 'react-icons/fi'
+import { fmtDate, fmtCurrency } from '../utils/Formatters.js'
 import './GoalsList.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
@@ -72,7 +73,7 @@ function GoalItem({ goal, onUpdate }) {
                 className="inline-input"
               />
             ) : (
-              <span>${goal.target_amount}</span>
+              <span>{fmtCurrency(goal.target_amount)}</span>
             )}
           </div>
 
@@ -87,7 +88,7 @@ function GoalItem({ goal, onUpdate }) {
                 className="inline-input"
               />
             ) : (
-              <span>${goal.saved_amount}</span>
+              <span>{fmtCurrency(goal.saved_amount)}</span>
             )}
           </div>
 
@@ -102,7 +103,7 @@ function GoalItem({ goal, onUpdate }) {
                 className="inline-input"
               />
             ) : (
-              <span>{goal.target_date}</span>
+              <span>{fmtDate(goal.target_date)}</span>
             )}
           </div>
         </div>
@@ -276,13 +277,6 @@ export default function GoalsList(){
     return (
       <div className="saved-goals-list" style={{ display:'flex', flexDirection:'column', gap:6 }}>
         {items.map(goal => (
-          // <div key={goal.id} className="card goal-item">
-          //   <h2>{goal.name}</h2>
-          //   <p>Target Amount: ${goal.target_amount}</p>
-          //   <p>Saved Amount: ${goal.saved_amount}</p>
-          //   <p>Target Date: {goal.target_date}</p>
-          //   <p>{goal.description}</p>
-          // </div>
           <GoalItem key={goal.id} goal={goal} onUpdate={fetchGoals} />
         ))}
       </div>

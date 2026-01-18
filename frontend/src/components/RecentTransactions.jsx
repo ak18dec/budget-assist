@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react'
 import axios from 'axios'
 import { FiInfo } from 'react-icons/fi'
-import { fmtDateTime, fmtMoney } from '../utils/Formatters.js'
+import { fmtDateTime, fmtCurrency } from '../utils/Formatters.js'
 import './RecentTransactions.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
@@ -12,15 +12,6 @@ const DUMMY = [
   {id: 't3', name: 'Notion', category: 'Productivity', account: 'Platinum', date: '2023-08-07T18:01:00Z', amount: -9.72},
   {id: 't4', name: 'Stripe', category: 'Income', account: 'Business', date: '2023-08-06T09:10:00Z', amount: 320.00},
 ]
-
-// function fmtDate(iso){
-//   try{ const d = new Date(iso); return d.toLocaleDateString(undefined, {day:'2-digit', month:'short', year:'numeric'}) + ' ' + d.toLocaleTimeString(undefined, {hour:'2-digit', minute:'2-digit'}) }
-//   catch(e){ return iso }
-// }
-// function fmtMoney(n){
-//   const sign = n >= 0 ? '+' : '-'
-//   return sign + ' $' + Math.abs(n).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
-// }
 
 export default function RecentTransactions(){
   const [items, setItems] = useState(DUMMY)
@@ -61,7 +52,7 @@ export default function RecentTransactions(){
             <div style={{display:'flex', gap:24, alignItems:'center', minWidth:340, justifyContent:'flex-end'}}>
               {/* <div style={{width:120, textAlign:'left'}} className="muted">{tx.account || '—'}</div> */}
               <div className="muted" style={{width:140, textAlign:'left'}}>{fmtDateTime(tx.date)}</div>
-              <div style={{width:120, textAlign:'right', fontWeight:500, fontSize:13, color: tx.amount >= 0 ? '#159969' : '#d62929'}}>{fmtMoney(tx.amount)}</div>
+              <div style={{width:120, textAlign:'right', fontWeight:500, fontSize:13, color: tx.amount >= 0 ? '#159969' : '#d62929'}}>{fmtCurrency(tx.amount)}</div>
             </div>
           </div>
         ))}
