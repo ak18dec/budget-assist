@@ -70,3 +70,18 @@ def get_financial_summary() -> FinancialSummary:
         budgets=list(budgets),
         goals=list(goals),
     )
+def update_goal(goal_id: int, goal_data) -> Goal:
+    for idx, g in enumerate(goals):
+        if g.id == goal_id:
+            updated_goal = g.model_copy(update=goal_data.dict())
+            goals[idx] = updated_goal
+            return updated_goal
+    raise ValueError("Goal not found") # In real code, raise HTTPException with 404 status
+
+def update_budget(budget_id: int, budget_data) -> Budget:
+    for idx, b in enumerate(budgets):
+        if b.id == budget_id:
+            updated_budget = b.model_copy(update=budget_data.dict())
+            budgets[idx] = updated_budget
+            return updated_budget
+    raise ValueError("Budget not found") # In real code, raise HTTPException with 404 status

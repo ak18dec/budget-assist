@@ -13,3 +13,8 @@ def create_budget(budget: models.BudgetBase):
 @router.get("/", response_model=List[models.Budget])
 def get_budgets():
     return storage.list_budgets()
+
+@router.put("/{budget_id}", response_model=models.Budget)
+def update_budget(budget_id: int, budget: models.BudgetBase):
+    updated = storage.update_budget(budget_id, budget)
+    return updated
