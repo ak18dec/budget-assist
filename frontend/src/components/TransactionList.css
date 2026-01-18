@@ -86,6 +86,15 @@
   border-bottom: 1px solid #f1f5f9;
 }
 
+.transaction-row.grid-3 {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 0.8fr;
+  align-items: center;
+
+  padding: 10px 6px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
 .transaction-row:last-child {
   border-bottom: none;
 }
@@ -121,6 +130,12 @@
   font-size: 12px;
 }
 
+.tx-date {
+  font-size: 12px;
+  text-align: center;
+  white-space: nowrap;
+}
+
 /* Right side */
 .tx-amount {
   font-weight: 600;
@@ -141,4 +156,16 @@
 .empty-state {
   padding: 12px;
   text-align: center;
+}
+
+@media (max-width: 640px) {
+  .transaction-row.grid-3 {
+    grid-template-columns: 1fr auto;
+    row-gap: 6px;
+  }
+
+  .tx-date {
+    grid-column: 1 / -1;
+    text-align: left;
+  }
 }

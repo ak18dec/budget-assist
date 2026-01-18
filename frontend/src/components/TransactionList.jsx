@@ -41,7 +41,7 @@ export default function TransactionList(){
         )}
 
         {items.map(tx => (
-          <div key={tx.id} className="transaction-row">
+          <div key={tx.id} className="transaction-row grid-3">
             {/* Left */}
             <div className="tx-left">
               <div className="tx-avatar">
@@ -50,9 +50,13 @@ export default function TransactionList(){
               <div>
                 <div className="tx-title">{capitalize(tx.category)}</div>
                 <div className="tx-sub muted">
-                  {fmtDateTime(tx.date)} {tx.description ? `— ${tx.description}` : ''}
+                  {tx.description ? `${tx.description}` : ''}
                 </div>
               </div>
+            </div>
+
+            <div className="tx-date muted">
+              {fmtDateTime(tx.date)}
             </div>
 
             {/* Right */}
