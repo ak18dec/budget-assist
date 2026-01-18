@@ -43,7 +43,7 @@
 }
 
 .tx-filter.active {
-  background: #0f172a;
+  background: var(--accent);
   color: white;
 }
 
@@ -173,7 +173,6 @@
 
 .tx-date {
   font-size: 12px;
-  text-align: center;
   white-space: nowrap;
 }
 
@@ -209,4 +208,16 @@
     grid-column: 1 / -1;
     text-align: left;
   }
+}
+
+.tx-header-sort {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.tx-header-sort.right {
+  justify-content: flex-end;
 }
