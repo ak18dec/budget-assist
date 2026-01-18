@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react'
 import axios from 'axios'
 import TransactionForm from './TransactionForm.jsx'
+import { fmtDate, fmtMoney } from '../utils/Formatters.js'
 import './TransactionList.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
@@ -44,9 +45,9 @@ export default function TransactionList(){
           <li key={tx.id}>
             <div>
               <div style={{fontWeight:600}}>{tx.category}</div>
-              <div className="muted">{tx.date} — {tx.description || ''}</div>
+              <div className="muted">{fmtDate(tx.date)} — {tx.description || ''}</div>
             </div>
-            <div style={{fontWeight:700}}>${tx.amount}</div>
+            <div style={{fontWeight:700}}>{fmtMoney(tx.amount)}</div>
           </li>
         ))}
       </ul>

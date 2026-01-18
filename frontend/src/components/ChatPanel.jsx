@@ -3,6 +3,7 @@ import axios from "axios";
 import "./ChatPanel.css";
 import { GoDependabot, GoTrash } from "react-icons/go";
 import { FiSend } from "react-icons/fi";
+import { fmtTime } from '../utils/Formatters.js'
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -70,13 +71,6 @@ export default function ChatPanel({ expanded, onToggle }) {
 
     const clearChat = () => {
         setMessages([...initialMessages]);
-    };
-
-    const formatTime = (timestamp) => {
-        return timestamp.toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-        });
     };
 
     const scrollToBottom = () => {
@@ -192,7 +186,7 @@ export default function ChatPanel({ expanded, onToggle }) {
                                         {message.text}
                                     </div>
                                     <div className="message-time">
-                                        {formatTime(message.timestamp)}
+                                        {fmtTime(message.timestamp)}
                                     </div>
                                 </div>
                             </div>

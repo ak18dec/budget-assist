@@ -47,7 +47,7 @@ function GoalItem({ goal, onUpdate }) {
         {isEditing ? <FiX /> : <FiEdit />}
       </button>
 
-      <div className="goal-content">
+      <div className={`goal-content ${isEditing ? 'editing' : ''}`}>
         {isEditing ? (
           <input
             className="form-input goal-title-input"
