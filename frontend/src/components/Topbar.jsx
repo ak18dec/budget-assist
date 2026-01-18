@@ -2,9 +2,11 @@ import {useEffect, useState, useRef} from 'react'
 import { FiSearch, FiBell, FiDownload } from 'react-icons/fi'
 import './Topbar.css'
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 async function fetchTransactions(){
   try{
-    const res = await fetch('/api/v1/transactions')
+    const res = await fetch(`${API_URL}/transactions`)
     if(!res.ok) throw new Error('Network response not ok')
     const data = await res.json()
     return Array.isArray(data) ? data : (data.items || [])
