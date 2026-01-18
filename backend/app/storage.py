@@ -7,9 +7,9 @@ _budget_auto_id = 1
 _goal_auto_id = 1
 
 transactions: List[Transaction] = [
-    Transaction(id=1, amount=12.5, category="coffee", date=date(2025, 12, 1), description="Morning latte"),
-    Transaction(id=2, amount=45.0, category="groceries", date=date(2025, 12, 2), description="Weekly shop"),
-    Transaction(id=3, amount=1200.0, category="rent", date=date(2025, 12, 1), description="Monthly rent"),
+    Transaction(id=1, amount=12.5, category="coffee", date=date(2025, 12, 1), description="Morning latte", type="EXPENSE"),
+    Transaction(id=2, amount=45.0, category="groceries", date=date(2025, 12, 2), description="Weekly shop", type="EXPENSE"),
+    Transaction(id=3, amount=1200.0, category="rent", date=date(2025, 12, 1), description="Monthly rent", type="EXPENSE"),
 ]
 budgets: List[Budget] = [
     Budget(id=1, name="Monthly Groceries", monthly_limit=400.0, alert_threshold=0.9, category="groceries", spent_this_month=400.0),

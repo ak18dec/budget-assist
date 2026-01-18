@@ -1,14 +1,18 @@
+from enum import Enum
 from pydantic import BaseModel, Field, field_validator, computed_field
 from typing import Optional, List
 from datetime import date
 
+class TransactionType(str, Enum):
+    expense = 'EXPENSE'
+    income = 'INCOME'
 
 class TransactionBase(BaseModel):
     amount: float
     category: str
     date: date
     description: Optional[str] = None
-
+    type: TransactionType
 
 class Transaction(TransactionBase):
     id: int
