@@ -1,34 +1,18 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, HttpUrl
 from typing import List
-from app.agents import notifier
+from app.storage import list_notifications, mark_read
+from app.models import Notification
 
 router = APIRouter()
 
+@router.get("", include_in_schema=False, response_model=List[Notification])
+@router.get("/", response_model=List[Notification])
+def get_notifications():
+    return list_notifications()
 
-class WebhookIn(BaseModel):
-    url: HttpUrl
-
-
-class WebhookOut(BaseModel):
-    id: int
-    url: HttpUrl
-
-
-@router.post("/webhooks", response_model=WebhookOut)
-def add_webhook(h: WebhookIn):
-    entry = notifier.register_webhook(str(h.url))
-    return WebhookOut(**entry)
-
-
-@router.get("/webhooks", response_model=List[WebhookOut])
-def list_webhooks():
-    return notifier.list_webhooks()
-
-
-@router.delete("/webhooks/{hook_id}")
-def delete_webhook(hook_id: int):
-    ok = notifier.remove_webhook(hook_id)
-    if not ok:
-        raise HTTPException(status_code=404, detail="webhook not found")
+@router.post("/{notification_id}}/read")
+def mark_notification_read(notification_id: int):
+    n = mark_read(notification_id)
+    if not n:
+        raise HTTPException(status_code=404, detail="Notification not found")
     return {"ok": True}

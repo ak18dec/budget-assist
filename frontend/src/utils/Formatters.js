@@ -23,3 +23,11 @@ export function fmtCurrency(amount) {
 export function capitalize(s) {
   return s ? s[0].toUpperCase() + s.slice(1) : '';
 }
+
+export function timeAgo(dateStr) {
+  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000)
+  if (diff < 60) return 'just now'
+  if (diff < 3600) return `${Math.floor(diff / 60)}m`
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h`
+  return `${Math.floor(diff / 86400)}d`
+}

@@ -1,7 +1,7 @@
 from enum import Enum
 from pydantic import BaseModel, Field, field_validator, computed_field
 from typing import Optional, List
-from datetime import date
+from datetime import date, datetime
 
 class TransactionType(str, Enum):
     EXPENSE = 'EXPENSE'
@@ -87,3 +87,11 @@ class ChatResponse(BaseModel):
 class IntentResponse(BaseModel):
     intent: str
     entities: dict = Field(default_factory=dict)
+
+class Notification(BaseModel):
+    id: int
+    notification_type: str
+    title: str
+    message: str
+    created_at: datetime
+    read: bool = False

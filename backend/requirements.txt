@@ -11,3 +11,5 @@ numpy
 
 python-dotenv
 huggingface_hub
+
+requests

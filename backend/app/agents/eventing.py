@@ -20,7 +20,9 @@ def register(event_name: str, handler: Callable[[Dict[str, Any]], Any]):
 
 
 def emit(event_name: str, payload: Dict[str, Any]):
+    print(f"📣 Event emitted: {event_name}", payload)
     handlers = _handlers.get(event_name, [])
+    print(f"👂 Handlers found: {len(handlers)}")
     results = []
     all_alerts = []
     for h in handlers:

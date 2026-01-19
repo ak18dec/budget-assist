@@ -10,8 +10,21 @@ router = APIRouter()
 @router.post("/", response_model=models.Transaction)
 def create_transaction(tx: models.TransactionBase):
     created = storage.add_transaction(tx)
+
+    payload = {
+        "id": created.id,
+        "amount": created.amount,
+        "category": created.category,
+        "type": created.type,
+        "date": created.date,
+        "description": created.description,
+    }
+
+    print("🔥 Emitting transaction.created event", created)
+    
     # Emit event for new transaction
-    eventing.emit("transaction.created", {"transaction": created.model_dump()})
+    eventing.emit("transaction.created", payload)
+    
     return created
 
 

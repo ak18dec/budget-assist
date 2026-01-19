@@ -1,10 +1,11 @@
-from typing import List, Dict
-from datetime import date
-from app.models import Transaction, Budget, Goal, FinancialSummary, TransactionType
+from typing import List
+from datetime import date, datetime, timezone
+from app.models import Notification, Transaction, Budget, Goal, FinancialSummary, TransactionType
 
 _tx_auto_id = 1
 _budget_auto_id = 1
 _goal_auto_id = 1
+_notification_counter = 1
 
 transactions: List[Transaction] = [
     Transaction(id=1, amount=12.5, category="coffee", date=date(2025, 12, 1), description="Morning latte", type="EXPENSE"),
@@ -24,6 +25,7 @@ goals: List[Goal] = [
     Goal(id=3, name="New Laptop", target_amount=2000.0, saved_amount=500.0, target_date=date(2026, 3, 31), description="Saving for a new laptop"),
 ]
 
+notifications: List[Notification] = []
 # keep auto ids in sync with seeded data
 _tx_auto_id = max(tx.id for tx in transactions) + 1
 _budget_auto_id = max(b.id for b in budgets) + 1
@@ -97,3 +99,73 @@ def update_budget(budget_id: int, budget_data) -> Budget:
             budgets[idx] = updated_budget
             return updated_budget
     raise ValueError("Budget not found") # In real code, raise HTTPException with 404 status
+
+
+def add_notification(notification_type: str, title: str, message: str) -> Notification:
+    global _notification_counter
+
+    print("Inside add_notification")
+    n = Notification(
+        id=_notification_counter,
+        notification_type=notification_type,
+        title=title,
+        message=message,
+        created_at=datetime.now(timezone.utc),
+        read=False
+    )
+    _notification_counter += 1
+    notifications.insert(0, n)
+    print("🔔 Notification added:", n)
+    return n
+
+def list_notifications():
+    return notifications
+
+def mark_read(id) -> Notification | None:
+    for n in notifications:
+        if n.id == id:
+            n.read = True
+            return n
+    return None
+        
+
+
+def get_budget_spending(category: str):
+    """
+    Returns (spent, limit, alert_threshold) for a given category.
+    If no budget exists, returns (0, 0, 0).
+    """
+    for b in budgets:
+        if b.category == category:
+            return (
+                b.spent_this_month,
+                b.monthly_limit,
+                b.alert_threshold
+            )
+    return (0.0, 0.0, 0.0)
+
+
+def get_goals_due_between(start: date, end: date):
+    """
+    Returns goals whose target_date is between start and end (inclusive).
+    """
+    due_goals = []
+    for g in goals:
+        if start <= g.target_date <= end:
+            due_goals.append({
+                "id": g.id,
+                "title": g.name,
+                "due_date": g.target_date,
+                "saved_amount": g.saved_amount,
+                "target_amount": g.target_amount,
+            })
+    return due_goals
+
+def get_balance() -> float:
+    total_income = sum(
+        tx.amount for tx in transactions if tx.type == TransactionType.INCOME
+    )
+    total_expense = sum(
+        abs(tx.amount) for tx in transactions if tx.type == TransactionType.EXPENSE
+    )
+    return total_income - total_expense

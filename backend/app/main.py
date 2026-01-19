@@ -2,8 +2,25 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import transactions, budgets, goals, summary, chat, agent, rag_routes, notifications
+from app.agents import notification_engine
+from contextlib import asynccontextmanager
 
-app = FastAPI(title="budget-assist - backend")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # ✅ Startup
+    notification_engine.setup_event_handlers()
+    print("🚀 Notification engine handlers registered")
+    print("🚀 Lifespan startup complete")
+    yield
+
+    # ✅ Shutdown (optional cleanup)
+    print("🛑 Application shutting down")
+
+
+app = FastAPI(
+    title="budget-assist - backend",
+    lifespan=lifespan
+)
 
 
 # Configure CORS (Cross-Origin Resource Sharing)
