@@ -32,7 +32,6 @@ export default function AppLayout() {
           display:'flex',
           flexDirection:'column',
           flexShrink:0,
-          transition: 'width 0.3s',
           borderLeft: '1px solid var(--border-light)',
           transition: 'width 0.3s ease',
           paddingLeft: 12,
