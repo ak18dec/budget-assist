@@ -55,6 +55,97 @@
   --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
 }
 
+
+/* ============================= */
+/* Dark Theme — Serendipity Sunset */
+/* ============================= */
+
+:root[data-theme="dark"] {
+  /* Core backgrounds */
+  --bg: #202231;
+  --window: #272938;
+  --card: #272938;
+  --sidebar-bg: #202231;
+
+  /* Text */
+  --primary-text: #DEE0EF;
+  --muted: #6B6D7C;
+
+  /* Accent */
+  --accent: #D6B4B4;
+  --accent-strong: #D1918F;
+
+  /* Status */
+  --success: #709BBD;
+  --danger: #D1918F;
+  --warning: #A392DC;
+
+  /* Borders */
+  --border-light: #6B6D7C26;
+  --border-lighter: #363847;
+
+  /* Shadows (subtle for dark UI) */
+  --shadow: 0 8px 24px rgba(0,0,0,0.35);
+  --shadow-light: 0 4px 12px rgba(0,0,0,0.25);
+  --shadow-medium: 0 12px 36px rgba(0,0,0,0.4);
+
+  /* Glass */
+  --glass: rgba(39,41,56,0.72);
+  --glass-strong: rgba(32,34,49,0.6);
+}
+
+/* ============================= */
+/* Component adjustments (dark) */
+/* ============================= */
+
+:root[data-theme="dark"] body {
+  background: var(--bg);
+  color: var(--primary-text);
+}
+
+:root[data-theme="dark"] .card {
+  background: var(--glass);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-light);
+}
+
+:root[data-theme="dark"] .button {
+  background: var(--accent);
+  color: #202231;
+}
+
+:root[data-theme="dark"] .button:hover {
+  box-shadow: 0 6px 18px rgba(214,180,180,0.25);
+}
+
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] textarea {
+  background: #202231;
+  color: var(--primary-text);
+  border: 1px solid var(--border-light);
+}
+
+:root[data-theme="dark"] input::placeholder {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .chart-tooltip {
+  background: #272938;
+  color: var(--primary-text);
+  border: 1px solid var(--border-light);
+}
+
+:root[data-theme="dark"] .muted {
+  color: var(--muted);
+}
+
+
+
+
+
+
+
+
 /* Reset and Base Styles */
 html,
 body,

@@ -1,5 +1,5 @@
 import {useEffect, useState, useRef} from 'react'
-import { FiSearch, FiBell, FiDownload } from 'react-icons/fi'
+import { FiSearch, FiBell, FiDownload, FiSun, FiMoon } from 'react-icons/fi'
 import { timeAgo } from '../utils/Formatters.js'
 import './Topbar.css'
 
@@ -41,6 +41,28 @@ function exportTransactions(){
     a.remove()
     URL.revokeObjectURL(url)
   })
+}
+
+function ThemeToggle() {
+  const [theme, setTheme] = useState(
+    document.documentElement.dataset.theme || "light"
+  );
+
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    setTheme(next);
+  };
+
+  return (
+    <button
+      className="button export"
+      onClick={toggleTheme}
+      aria-label="Toggle theme"
+    >
+      {theme === "dark" ? <FiSun size={14} /> : <FiMoon size={14} />}
+    </button>
+  );
 }
 
 function NotificationBell(){
@@ -152,6 +174,8 @@ export default function Topbar(){
         </button>
 
         <NotificationBell />
+
+        <ThemeToggle />
 
         <button className="button export" onClick={exportTransactions} aria-label="Export transactions">
           <FiDownload size={14} style={{marginRight:8}} />
