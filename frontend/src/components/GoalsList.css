@@ -100,16 +100,18 @@
 .goal-progress {
   margin-top: 8px;
   height: 6px;
-  background: #eee;
   border-radius: 6px;
   overflow: hidden;
   width: 95%;
+  background: rgba(0, 0, 0, 0.08);
 }
 
 .goal-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #4caf50, #81c784);
+  /* background: linear-gradient(90deg, #4caf50, #81c784); */
+  background: green;
   transition: width 200ms ease;
+  border-radius: inherit;
 }
 
 .goal-progress-text {
