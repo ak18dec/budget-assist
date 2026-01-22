@@ -152,10 +152,7 @@ function GoalItem({ goal, onUpdate }) {
   )
 }
 
-
-export default function GoalsList(){
-  const [items, setItems] = useState([])
-  const [showForm, setShowForm] = useState(false);
+function GoalForm() {
   const [formData, setFormData] = useState({
     name: '',
     target_amount: '',
@@ -163,6 +160,98 @@ export default function GoalsList(){
     target_date: '',
     description: ''
   });
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevData => (
+      { 
+        ...prevData, 
+        [name]: name == 'target_amount' || name == 'saved_amount' ? parseFloat(value) : value 
+      }
+    ));
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API_URL}/goals/`, formData);
+      setFormData({
+        name: '',
+        target_amount: '',
+        saved_amount: '',
+        target_date: '',
+        description: ''
+      });
+      window.dispatchEvent(new Event('goals:changed'));
+    } catch (err) {
+      console.error('Failed to add goal', err);
+    }
+  };
+
+  return (
+    <form className="card" onSubmit={handleFormSubmit}>
+      <h2 className='muted'>Add Goal</h2>
+      <div className="form-row">
+        <input
+        className='form-input'
+        type="text"
+        name="name"
+        placeholder="Goal Name"
+        value={formData.name}
+        onChange={handleFormChange}
+        required
+      />
+      <input
+        className='form-input'
+        type="number"
+        name="target_amount"
+        placeholder="Target Amount"
+        value={formData.target_amount}
+        onChange={handleFormChange}
+      />
+      <input
+        className='form-input'
+        type="number"
+        name="saved_amount"
+        placeholder="Saved Amount"
+        value={formData.saved_amount}
+        onChange={handleFormChange}
+      />
+      <input
+        className='form-input'
+        type="date"
+        name="target_date"
+        placeholder="Target Date"
+        value={formData.target_date}
+        onChange={handleFormChange}
+      />
+      <input
+        className='form-input'
+        type="text"  
+        name="description"
+        placeholder="Description"
+        value={formData.description}
+        onChange={handleFormChange}
+      />
+      <button className='button' type='submit'>Add Goal</button>
+      </div>
+    </form>
+  );
+}
+
+function SavedGoals({ items , fetchGoals}) {
+  return (
+    <div className="saved-goals-list" style={{ display:'flex', flexDirection:'column', gap:6 }}>
+      {items.map(goal => (
+        <GoalItem key={goal.id} goal={goal} onUpdate={fetchGoals} />
+      ))}
+    </div>
+  );
+}
+  
+export default function GoalsList(){
+  const [items, setItems] = useState([])
+  const [showForm, setShowForm] = useState(false);
 
   async function fetchGoals(){
     try{
@@ -182,106 +271,11 @@ export default function GoalsList(){
     }
   }
 
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevData => (
-      { 
-        ...prevData, 
-        [name]: name == 'target_amount' || name == 'saved_amount' ? parseFloat(value) : value 
-      }
-    ));
-  };
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post(`${API_URL}/goals/`, formData);
-      setShowForm(false);
-      setFormData({
-        name: '',
-        target_amount: '',
-        saved_amount: '',
-        target_date: '',
-        description: ''
-      });
-      setShowForm(false);
-      fetchGoals();
-      window.dispatchEvent(new Event('goals:changed'));
-    } catch (err) {
-      console.error('Failed to add goal', err);
-    }
-  };
-
   useEffect(()=>{
     fetchGoals();
     window.addEventListener('goals:changed', fetchGoals)
     return ()=> window.removeEventListener('goals:changed', fetchGoals)
   }, [])
-
-  function GoalForm() {
-    return (
-      <form className="card" onSubmit={handleFormSubmit}>
-        <h2 className='muted'>Add Goal</h2>
-        <div className="form-row">
-          <input
-          className='form-input'
-          type="text"
-          name="name"
-          placeholder="Goal Name"
-          value={formData.name}
-          onChange={handleFormChange}
-          required
-        />
-        <input
-          className='form-input'
-          type="number"
-          name="target_amount"
-          placeholder="Target Amount"
-          value={formData.target_amount}
-          onChange={handleFormChange}
-        />
-        <input
-          className='form-input'
-          type="number"
-          name="saved_amount"
-          placeholder="Saved Amount"
-          value={formData.saved_amount}
-          onChange={handleFormChange}
-        />
-        <input
-          className='form-input'
-          type="date"
-          name="target_date"
-          placeholder="Target Date"
-          value={formData.target_date}
-          onChange={handleFormChange}
-        />
-        <input
-          className='form-input'
-          type="text"  
-          name="description"
-          placeholder="Description"
-          value={formData.description}
-          onChange={handleFormChange}
-        />
-        <button className='button' type='submit'>Add Goal</button>
-        </div>
-        
-      </form>
-    );
-  }
-
-
-
-  function SavedGoals() {
-    return (
-      <div className="saved-goals-list" style={{ display:'flex', flexDirection:'column', gap:6 }}>
-        {items.map(goal => (
-          <GoalItem key={goal.id} goal={goal} onUpdate={fetchGoals} />
-        ))}
-      </div>
-    );
-  }
 
   return (
     <div className='card' style={{ gap: 12, display: 'flex', flexDirection: 'column', marginBottom: 20 }}>
@@ -296,7 +290,7 @@ export default function GoalsList(){
         { items.length === 0 ? (
           <div className="card muted">No goals available.</div>
         ) : (
-          <SavedGoals />
+          <SavedGoals items={items} fetchGoals={fetchGoals}/>
         ) }
       </div>
     </div>
