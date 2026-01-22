@@ -1,6 +1,6 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useRef} from 'react'
 import axios from 'axios'
-import { FiPlus } from 'react-icons/fi'
+import { FiPlus, FiChevronUp, FiChevronDown } from 'react-icons/fi'
 import './BudgetList.css'
 import { fmtCurrency } from '../utils/Formatters.js'
 
@@ -33,13 +33,57 @@ const getCategeoryIcon = (category) => {
   }
 }
 
-function BudgetForm() {
+function CategoryDropdown({ value, onChange, options, placeholder = "Select Category" }) {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef();
+
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="range-dropdown type-dropdown" ref={dropdownRef}>
+      <div className="range-trigger" onClick={() => setOpen(prev => !prev)}>
+        {value || placeholder}
+        {open ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+      </div>
+
+      {open && (
+        <div className="range-menu">
+          {options.map(opt => (
+            <button
+              key={opt}
+              type="button"
+              className={`range-item ${value === opt ? 'active' : ''}`}
+              onClick={() => { onChange(opt); setOpen(false); }}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BudgetForm({ onSuccess, categories }) {
   const [formData, setFormData] = useState({
     name: '',
     category: '',
     monthly_limit: '',
     alert_threshold: 0.8
   });
+
+  const handleCategoryChange = (cat) => {
+    setFormData(prev => ({ ...prev, category: cat }));
+  };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -61,6 +105,7 @@ function BudgetForm() {
         alert_threshold: parseFloat(formData.alert_threshold)
       });
       setFormData({ name: '', category: '', monthly_limit: '', alert_threshold: 0.8 });
+      onSuccess();
       // setShowForm(false);
       // fetchBudgets();
       window.dispatchEvent(new Event('budgets:changed'));
@@ -71,7 +116,7 @@ function BudgetForm() {
   };
 
   return (
-    <form onSubmit={handleFormSubmit} className='card'>
+    <form onSubmit={handleFormSubmit} className='card' style={{zIndex: 1000}}>
       <h2 className='muted'>Add Budget</h2>
       <div className="form-row">
         <input
@@ -83,18 +128,12 @@ function BudgetForm() {
           onChange={handleFormChange}
           required
         />
-        <select
-          className='form-input budget-category'
-          name="category"
+        <CategoryDropdown
           value={formData.category}
-          onChange={handleFormChange}
-          required
-        >
-          <option value="" disabled>Select Category</option>
-          {categories.map(cat => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
+          onChange={handleCategoryChange}
+          options={categories}
+          placeholder="Select Category"
+        />
         <input
           className='form-input budget-monthly-limit'
           type="number"
@@ -212,7 +251,7 @@ export default function BudgetList() {
               { showForm ? ('Cancel') : (<><FiPlus size={14} style={{marginRight: 8}} /> Add Budget</>)}
             </button>
           </div>
-          {showForm && <BudgetForm  onSuccess={fetchBudgets} />}
+          {showForm && <BudgetForm  onSuccess={fetchBudgets} categories={categories}/>}
           <div>
             { items.length === 0 ? (
               <div className="card muted">No budgets set up yet. Create your first budget above!</div>
