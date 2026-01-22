@@ -17,7 +17,7 @@ def _build_prompt(message: str, summary: Dict[str, Any]) -> str:
     return (
         "You are a helpful financial assistant.\n\n"
         f"User financial summary:\n"
-        f"- Total spent: ${summary['total_spent']:.2f}\n\n"
+        f"- Total spent: ${summary['total_expense']:.2f}\n\n"
         f"User question:\n{message}\n\n"
         "Answer concisely and helpfully."
     )
