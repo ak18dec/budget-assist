@@ -48,6 +48,12 @@
   --border-light: rgba(60,60,67,0.12);
   --border-lighter: rgba(60,60,67,0.08);
 
+  --chat-user-bg: rgba(10, 132, 255, 0.14);
+  --chat-user-text: var(--primary-text);
+
+  --chat-bot-bg: rgba(60, 60, 67, 0.06);
+  --chat-bot-text: var(--primary-text);
+
   /* Typography - SF Pro Display for headings, SF Pro Text for body (system stack)
      SF fonts are native on macOS; other platforms will fall back to sensible fonts */
   --font-family-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
@@ -92,6 +98,12 @@
   /* Glass */
   --glass: rgba(39,41,56,0.72);
   --glass-strong: rgba(32,34,49,0.6);
+
+  --chat-user-bg: rgba(10, 132, 255, 0.28);
+  --chat-user-text: #e5e7eb;
+
+  --chat-bot-bg: rgba(255, 255, 255, 0.08);
+  --chat-bot-text: #e5e7eb;
 }
 
 /* ============================= */

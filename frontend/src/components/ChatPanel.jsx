@@ -16,6 +16,20 @@ const initialMessages = [
     },
 ];
 
+function TypingIndicator() {
+    return (
+    <div className="typing-indicator typing-fade-in">
+        <span />
+        <span />
+        <span />
+    </div>
+    )
+}
+
+function isMobile() {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 export default function ChatPanel({ expanded, onToggle }) {
     const [inputText, setInputText] = useState("");
     const [messages, setMessages] = useState([...initialMessages]);
@@ -76,20 +90,6 @@ export default function ChatPanel({ expanded, onToggle }) {
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
-
-    function isMobile() {
-        return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    }
-
-    function TypingIndicator() {
-      return (
-        <div className="typing-indicator typing-fade-in">
-          <span />
-          <span />
-          <span />
-        </div>
-      )
-    }
 
     useEffect(() => {
         scrollToBottom();
