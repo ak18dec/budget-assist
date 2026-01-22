@@ -137,3 +137,19 @@
   padding-bottom: 42px;
   /* background-color: rgba(0, 0, 0, 0.02);  */
 }
+
+.saved-goals-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .saved-goals-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.goal-item {
+  height: 100%;
+}

@@ -241,7 +241,7 @@ function GoalForm() {
 
 function SavedGoals({ items , fetchGoals}) {
   return (
-    <div className="saved-goals-list" style={{ display:'flex', flexDirection:'column', gap:6 }}>
+    <div className="saved-goals-list">
       {items.map(goal => (
         <GoalItem key={goal.id} goal={goal} onUpdate={fetchGoals} />
       ))}
