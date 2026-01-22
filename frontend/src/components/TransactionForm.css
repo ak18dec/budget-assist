@@ -94,3 +94,75 @@ select.form-input {
   background-size: 14px;
   padding-right: 28px;
 }
+
+.t-range-dropdown.t-type-dropdown {
+  position: relative;
+  display: inline-block;
+  width: 120px;
+}
+
+.t-range-trigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  width: 100%;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--window);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--font-family);
+}
+
+.t-range-trigger .chevron {
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.t-range-trigger:hover {
+  background: var(--bg-hover);
+}
+
+.t-range-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  margin-top: 4px;
+  padding: 4px 0;
+  background: var(--window);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.t-range-item {
+  display: block;
+  width: 100%;
+  padding: 6px 10px;
+  text-align: left;
+  font-size: 13px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  font-family: var(--font-family);
+}
+
+.t-range-item:hover {
+  color: var(--accent);
+  background: var(--accent-light);
+}
+
+.t-range-item.active {
+  font-weight: 650;
+  color: var(--accent);
+  background: var(--accent-light);
+}
+
+.t-range-item.highlighted {
+  background: var(--accent-light);
+}
+
