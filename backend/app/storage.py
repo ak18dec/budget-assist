@@ -1,5 +1,6 @@
 from datetime import date, datetime, timezone
 from app.models import Notification, Transaction, Budget, Goal, FinancialSummary, TransactionType
+from collections import defaultdict
 
 _tx_auto_id = 1
 _budget_auto_id = 1
@@ -181,3 +182,34 @@ def get_balance() -> float:
         abs(tx.amount) for tx in transactions if tx.type == TransactionType.EXPENSE
     )
     return total_income - total_expense
+
+def get_monthly_income_expense(start: date, end: date):
+    """
+    Returns:
+    [
+      { "month": "Jan", "income": 0, "expense": 0 },
+      ...
+    ]
+    """
+    monthly = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
+
+    for tx in transactions:
+        if start <= tx.date <= end:
+            month = tx.date.strftime("%b")
+            if tx.type == TransactionType.INCOME:
+                monthly[month]["income"] += tx.amount
+            else:
+                monthly[month]["expense"] += abs(tx.amount)
+
+    # ensure months order
+    ordered_months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+
+    result = []
+    for m in ordered_months:
+        result.append({
+            "month": m,
+            "income": monthly[m]["income"],
+            "expense": monthly[m]["expense"],
+        })
+
+    return result
