@@ -126,6 +126,12 @@ export default function FinancialChart({ data, range, onRangeChange }){
     setSelectedMonth(prev => prev===data.month? null : data.month)
   }
 
+  const maxYAxis = useMemo(() => {
+    const allValues = d.flatMap(row => [row.income, row.expense])
+    const maxValue = allValues.length ? Math.max(...allValues) : 20000
+    return Math.max(maxValue, 20000) // ensure at least 20000
+  }, [d])
+
   return (
     <div>
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8}}>
@@ -150,8 +156,13 @@ export default function FinancialChart({ data, range, onRangeChange }){
               axisLine={{ stroke: 'var(--border-lighter)', strokeWidth: 1 }}
               tickLine={false}
             />
-            <YAxis axisLine={false} tickLine={false} tick={{fill:'var(--muted)', fontSize:12}} 
-            tickFormatter={v => YAxisFormatter(v)} />
+            <YAxis 
+              axisLine={false} 
+              tickLine={false} 
+              tick={{fill:'var(--muted)', fontSize:12}} 
+              tickFormatter={v => YAxisFormatter(v)} 
+              domain={[0, maxYAxis]}
+            />
             <Tooltip content={<CustomTooltip/>} />
             <Bar 
               dataKey="income" 
