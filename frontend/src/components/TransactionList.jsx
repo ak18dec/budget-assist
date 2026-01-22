@@ -107,7 +107,7 @@ export default function TransactionList(){
             {/* Left */}
             <div className="tx-left">
               <div className="tx-avatar">
-                {(tx.category || '?').slice(0,1)}
+                {(capitalize(tx.category) || '?').slice(0,1)}
               </div>
               <div>
                 <div className="tx-title">{capitalize(tx.category)}</div>
