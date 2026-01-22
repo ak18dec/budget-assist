@@ -1,30 +1,67 @@
-import {useMemo, useState} from 'react'
+import {useMemo, useState, useRef, useEffect} from 'react'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from 'recharts'
-import { FiInfo, FiArrowUp, FiArrowDown } from 'react-icons/fi'
+import { FiInfo, FiArrowUp, FiArrowDown, FiChevronUp, FiChevronDown } from 'react-icons/fi'
 import { fmtCurrency } from '../utils/Formatters.js'
 import './FinancialChart.css'
 
-const sampleData = [
-  { month: 'Jan', income: 12000, expense: 8000 },
-  { month: 'Feb', income: 15000, expense: 9000 },
-  { month: 'Mar', income: 10000, expense: 7000 },
-  { month: 'Apr', income: 18000, expense: 11000 },
-  { month: 'May', income: 22000, expense: 14000 },
-  { month: 'Jun', income: 14000, expense: 9000 },
-  { month: 'Jul', income: 19500, expense: 12000 },
-  { month: 'Aug', income: 16000, expense: 10000 },
-  { month: 'Sep', income: 17500, expense: 10500 },
-  { month: 'Oct', income: 14500, expense: 9500 },
-  { month: 'Nov', income: 13000, expense: 8500 },
-  { month: 'Dec', income: 12000, expense: 8000 },
-]
-
-// function formatMoney(n){
-//   return `$${Number(n).toLocaleString(undefined,{maximumFractionDigits:0})}`
-// }
-
 function YAxisFormatter(value){
   return `₹${(value/1000).toFixed(0)}K`
+}
+
+function RangeDropdown({ value, onChange }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  const OPTIONS = [
+    { label: "This year", value: "THIS_YEAR" },
+    { label: "Last year", value: "LAST_YEAR" },
+    { label: "Last 5 years", value: "LAST_5_YEARS" },
+  ]
+
+  const selected = OPTIONS.find(o => o.value === value)
+
+  useEffect(() => {
+    function onClickOutside(e) {
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", onClickOutside)
+    return () => document.removeEventListener("mousedown", onClickOutside)
+  }, [])
+
+  return (
+    <div className="range-dropdown" ref={ref}>
+      <button
+        className="range-trigger"
+        onClick={() => setOpen(o => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span>{selected?.label}</span>
+        {open ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+      </button>
+
+      {open && (
+        <div className="range-menu" role="listbox">
+          {OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              className={`range-item ${opt.value === value ? "active" : ""}`}
+              onClick={() => {
+                onChange(opt.value)
+                setOpen(false)
+              }}
+              role="option"
+              aria-selected={opt.value === value}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 function CustomTooltip({active, payload, label}){
@@ -44,7 +81,7 @@ function CustomTooltip({active, payload, label}){
 
   return (
     <div className="chart-tooltip card" style={{padding:12, minWidth:180, paddingLeft:10}}>
-      <div style={{fontSize:12, fontWeight:'550',color:'#6b7280', marginBottom:6}}>{label.toUpperCase()} 2025</div>
+      <div style={{fontSize:12, fontWeight:'550',color:'#6b7280', marginBottom:6}}>{label} 2025</div>
       <div style={{ display:'flex', gap:8}}>
         <div style={{width:4, height:40, backgroundColor:'var(--accent)', borderRadius:5}}></div>
         <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', gap:4}}>
@@ -70,7 +107,7 @@ function CustomTooltip({active, payload, label}){
   )
 }
 
-export default function FinancialChart({data}){
+export default function FinancialChart({ data, range, onRangeChange }){
   const [selectedMonth, setSelectedMonth] = useState(null)
   const d = data || sampleData
 
@@ -96,11 +133,10 @@ export default function FinancialChart({data}){
         <div style={{display:'flex', gap:12, alignItems:'center'}}>
           <div style={{display:'flex', gap:8, alignItems:'center'}}><div style={{width:8,height:8,background:'var(--accent)',borderRadius:5}} /> <div className="muted">Income</div></div>
           <div style={{display:'flex', gap:8, alignItems:'center'}}><div style={{width:8,height:8,background:'var(--muted-blue)',borderRadius:5}} /> <div className="muted">Expense</div></div>
-          <select className="muted" style={{padding:6, borderRadius:8, border:'1px solid var(--border-light)'}}>
-            <option>This year</option>
-            <option>Last year</option>
-            <option>Last 5 years</option>
-          </select>
+          <RangeDropdown
+            value={range}
+            onChange={onRangeChange}
+          />
         </div>
       </div>
 
@@ -117,12 +153,26 @@ export default function FinancialChart({data}){
             <YAxis axisLine={false} tickLine={false} tick={{fill:'var(--muted)', fontSize:12}} 
             tickFormatter={v => YAxisFormatter(v)} />
             <Tooltip content={<CustomTooltip/>} />
-            <Bar dataKey="income" barSize={18} radius={[3,3,0,0]} onClick={handleBarClick}>
+            <Bar 
+              dataKey="income" 
+              barSize={18} 
+              radius={[3,3,0,0]}
+              isAnimationActive={range === "THIS_YEAR"}
+              animationDuration={600}
+              animationEasing="ease-out" 
+              onClick={handleBarClick}>
               {withDelta.map((entry, idx) => (
                 <Cell key={`income-${idx}`} fill={entry.month===selectedMonth? 'var(--accent-strong)' : 'var(--accent)'} style={entry.month===selectedMonth? {filter:'drop-shadow(0 6px 18px rgba(10,132,255,0.18))'}:{}} />
               ))}
             </Bar>
-            <Bar dataKey="expense" barSize={18} radius={[3,3,0,0]} onClick={handleBarClick}>
+            <Bar 
+              dataKey="expense" 
+              barSize={18} 
+              radius={[3,3,0,0]}
+              isAnimationActive={range === "THIS_YEAR"}
+              animationDuration={600}
+              animationEasing="ease-out"
+              onClick={handleBarClick}>
               {withDelta.map((entry, idx) => (
                 <Cell key={`exp-${idx}`} fill={entry.month===selectedMonth? 'rgba(10,132,255,0.08)' : 'var(--muted-blue)'} />
               ))}

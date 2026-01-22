@@ -31,3 +31,22 @@ export function timeAgo(dateStr) {
   if (diff < 86400) return `${Math.floor(diff / 3600)}h`
   return `${Math.floor(diff / 86400)}d`
 }
+
+export function rangeToQuery(range) {
+  const now = new Date()
+  const year = now.getFullYear()
+
+  switch (range) {
+    case "THIS_YEAR":
+      return { from: `${year}-01-01`, to: `${year}-12-31` }
+
+    case "LAST_YEAR":
+      return { from: `${year - 1}-01-01`, to: `${year - 1}-12-31` }
+
+    case "LAST_5_YEARS":
+      return { from: `${year - 4}-01-01`, to: `${year}-12-31` }
+
+    default:
+      return {}
+  }
+}
