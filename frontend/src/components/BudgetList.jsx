@@ -6,10 +6,34 @@ import { fmtCurrency } from '../utils/Formatters.js'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
-export default function BudgetList() {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+const categories = ['Housing', 'Food', 'Transportation', 'Entertainment', 'Utilities', 'Healthcare', 'Savings', 'Miscellaneous', 'Groceries', 'Education' , 'Shopping', 'Dininig'];
+
+const getProgressColor = (percentage) => {
+    if (percentage >= 1) return 'red';
+    if (percentage >= 0.8) return 'orange';
+    if (percentage >= 0.6) return 'yellow';
+    return 'green';
+}
+
+const getCategeoryIcon = (category) => {
+  switch(category){
+    case 'Housing': return '🏠';
+    case 'Food': return '🍽️';
+    case 'Transportation': return '🚗';
+    case 'Entertainment': return '🎬';
+    case 'Utilities': return '💡';
+    case 'Healthcare': return '🏥';
+    case 'Savings': return '💰';
+    case 'Miscellaneous': return '📦';
+    case 'Groceries': return '🛒';
+    case 'Education' : return '🎓';
+    case 'Shopping' : return '🛍️';
+    case 'Dining' : return '🍽️';
+    default: return '💼';
+  }
+}
+
+function BudgetForm() {
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -17,7 +41,137 @@ export default function BudgetList() {
     alert_threshold: 0.8
   });
 
-  const categories = ['Housing', 'Food', 'Transportation', 'Entertainment', 'Utilities', 'Healthcare', 'Savings', 'Miscellaneous', 'Groceries', 'Education' , 'Shopping', 'Dininig'];
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevData => (
+      { 
+        ...prevData, 
+        [name]: name == 'monthly_limit' || name == 'alert_threshold' ? parseFloat(value) : value 
+      }
+    ));
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API_URL}/budgets/`, {
+        name: formData.name,
+        category: formData.category,
+        monthly_limit: parseFloat(formData.monthly_limit),
+        alert_threshold: parseFloat(formData.alert_threshold)
+      });
+      setFormData({ name: '', category: '', monthly_limit: '', alert_threshold: 0.8 });
+      // setShowForm(false);
+      // fetchBudgets();
+      window.dispatchEvent(new Event('budgets:changed'));
+    } catch (err) {
+      console.error(err);
+      alert('Failed to add budget');
+    }
+  };
+
+  return (
+    <form onSubmit={handleFormSubmit} className='card'>
+      <h2 className='muted'>Add Budget</h2>
+      <div className="form-row">
+        <input
+          className='form-input budget-name'
+          type="text"
+          name="name"
+          placeholder="Budget Name"
+          value={formData.name}
+          onChange={handleFormChange}
+          required
+        />
+        <select
+          className='form-input budget-category'
+          name="category"
+          value={formData.category}
+          onChange={handleFormChange}
+          required
+        >
+          <option value="" disabled>Select Category</option>
+          {categories.map(cat => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
+        </select>
+        <input
+          className='form-input budget-monthly-limit'
+          type="number"
+          step="0.01"
+          name="monthly_limit"
+          placeholder="Monthly Limit"
+          value={formData.monthly_limit}
+          onChange={handleFormChange}
+          required
+        />
+        <input
+          className='form-input budget-alert-threshold'
+          type="number"
+          step="0.01"
+          name="alert_threshold"
+          placeholder="Alert Threshold (e.g., 0.8 for 80%)"
+          value={formData.alert_threshold}
+          onChange={handleFormChange}
+          required
+        />
+        <button className="button add-budget-btn" type="submit">Add Budget</button>
+      </div>
+    </form>
+  );
+}
+
+function BudgetCard({budget}) {
+  return (
+    <div className="card budget-card">
+      <div className="budget-header">
+        <div className="budget-icon">{getCategeoryIcon(budget.category)}</div>
+        <div className="budget-title">
+          <h3 className="budget-name">{budget.name}</h3>
+          <p className='budget-limit'>Limit: {fmtCurrency(budget.monthly_limit)}</p>
+        </div>
+        {budget.is_over_threshold && (
+          <div className="budget-alert">⚠️ Over Alert Threshold</div>
+        )}
+      </div>
+      <div className="budget-progress">
+        <div className='progress-bar'>
+          <div className="progress-fill" 
+            style={{ 
+              width: `${Math.min(budget.budget_used_percentage * 100, 100)}%`, 
+              backgroundColor: getProgressColor(budget.budget_used_percentage) 
+            }} 
+          ></div>
+          <div className="progress-text">
+            {(budget.budget_used_percentage * 100).toFixed(1)}% used
+          </div>
+        </div>
+      </div>
+      <div className='budget-amounts'>
+        <div className="amount-item">
+          <span className="amount-label">Spent:</span> {fmtCurrency(budget.spent_this_month)}</div>
+        <div className="amount-item">
+          <span className="amount-label">Remaining:</span> {fmtCurrency(budget.remaining_budget)}</div>  
+      </div>
+      <div className={`budget-warning ${budget.is_over_threshold ? 'visible' : ''}`}>
+        ⚠️ You have exceeded your alert threshold of {(budget.alert_threshold * 100).toFixed(0)}%!
+      </div>
+    </div>
+  );
+}
+
+function SavedBudgets({ items }) {
+  return (
+    <div className="saved-budgets">
+    {items.map(budget => (<BudgetCard key={budget.id} budget={budget} />))}
+    </div>
+  );
+}
+
+export default function BudgetList() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   async function fetchBudgets(){
     try{
@@ -46,161 +200,8 @@ export default function BudgetList() {
     return ()=> window.removeEventListener('budgets:changed', fetchBudgets)
   }, []);
 
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevData => (
-      { 
-        ...prevData, 
-        [name]: name == 'monthly_limit' || name == 'alert_threshold' ? parseFloat(value) : value 
-      }
-    ));
-  };
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post(`${API_URL}/budgets/`, {
-        name: formData.name,
-        category: formData.category,
-        monthly_limit: parseFloat(formData.monthly_limit),
-        alert_threshold: parseFloat(formData.alert_threshold)
-      });
-      setFormData({ name: '', category: '', monthly_limit: '', alert_threshold: 0.8 });
-      setShowForm(false);
-      fetchBudgets();
-      window.dispatchEvent(new Event('budgets:changed'));
-    } catch (err) {
-      console.error(err);
-      alert('Failed to add budget');
-    }
-  };
-
-  const getProgressColor = (percentage) => {
-    if (percentage >= 1) return 'red';
-    if (percentage >= 0.8) return 'orange';
-    if (percentage >= 0.6) return 'yellow';
-    return 'green';
-  }
-
-  const getCategeoryIcon = (category) => {
-    switch(category){
-      case 'Housing': return '🏠';
-      case 'Food': return '🍽️';
-      case 'Transportation': return '🚗';
-      case 'Entertainment': return '🎬';
-      case 'Utilities': return '💡';
-      case 'Healthcare': return '🏥';
-      case 'Savings': return '💰';
-      case 'Miscellaneous': return '📦';
-      case 'Groceries': return '🛒';
-      case 'Education' : return '🎓';
-      case 'Shopping' : return '🛍️';
-      case 'Dining' : return '🍽️';
-      default: return '💼';
-    }
-  }
-
   if(loading) {
     return <div className='card'>Loading budgets...</div> 
-  }
-
-  function BudgetForm() {
-    return (
-      <form onSubmit={handleFormSubmit} className='card'>
-        <h2 className='muted'>Add Budget</h2>
-        <div className="form-row">
-          <input
-            className='form-input budget-name'
-            type="text"
-            name="name"
-            placeholder="Budget Name"
-            value={formData.name}
-            onChange={handleFormChange}
-            required
-          />
-          <select
-            className='form-input budget-category'
-            name="category"
-            value={formData.category}
-            onChange={handleFormChange}
-            required
-          >
-            <option value="" disabled>Select Category</option>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-          <input
-            className='form-input budget-monthly-limit'
-            type="number"
-            step="0.01"
-            name="monthly_limit"
-            placeholder="Monthly Limit"
-            value={formData.monthly_limit}
-            onChange={handleFormChange}
-            required
-          />
-          <input
-            className='form-input budget-alert-threshold'
-            type="number"
-            step="0.01"
-            name="alert_threshold"
-            placeholder="Alert Threshold (e.g., 0.8 for 80%)"
-            value={formData.alert_threshold}
-            onChange={handleFormChange}
-            required
-          />
-          <button className="button add-budget-btn" type="submit">Add Budget</button>
-        </div>
-      </form>
-    );
-  }
-
-  function BudgetCard({budget}) {
-    return (
-      <div className="card budget-card">
-        <div className="budget-header">
-          <div className="budget-icon">{getCategeoryIcon(budget.category)}</div>
-          <div className="budget-title">
-            <h3 className="budget-name">{budget.name}</h3>
-            <p className='budget-limit'>Limit: {fmtCurrency(budget.monthly_limit)}</p>
-          </div>
-          {budget.is_over_threshold && (
-            <div className="budget-alert">⚠️ Over Alert Threshold</div>
-          )}
-        </div>
-        <div className="budget-progress">
-          <div className='progress-bar'>
-            <div className="progress-fill" 
-              style={{ 
-                width: `${Math.min(budget.budget_used_percentage * 100, 100)}%`, 
-                backgroundColor: getProgressColor(budget.budget_used_percentage) 
-              }} 
-            ></div>
-            <div className="progress-text">
-              {(budget.budget_used_percentage * 100).toFixed(1)}% used
-            </div>
-          </div>
-        </div>
-        <div className='budget-amounts'>
-          <div className="amount-item">
-            <span className="amount-label">Spent:</span> {fmtCurrency(budget.spent_this_month)}</div>
-          <div className="amount-item">
-            <span className="amount-label">Remaining:</span> {fmtCurrency(budget.remaining_budget)}</div>  
-        </div>
-        <div className={`budget-warning ${budget.is_over_threshold ? 'visible' : ''}`}>
-          ⚠️ You have exceeded your alert threshold of {(budget.alert_threshold * 100).toFixed(0)}%!
-        </div>
-      </div>
-    );
-  }
-
-  function SavedBudgets() {
-    return (
-      <div className="saved-budgets">
-      {items.map(budget => (<BudgetCard key={budget.id} budget={budget} />))}
-      </div>
-    );
   }
 
   return (
@@ -216,7 +217,7 @@ export default function BudgetList() {
             { items.length === 0 ? (
               <div className="card muted">No budgets set up yet. Create your first budget above!</div>
             ) : (
-              <SavedBudgets />
+              <SavedBudgets items={items}/>
             ) }
           </div>
         </div>
