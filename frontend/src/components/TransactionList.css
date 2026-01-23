@@ -17,14 +17,14 @@
 
   position: sticky;
   top: 0;
-  background: #fff;
+  background: var(--window);
   z-index: 2;
   padding-top: 8px;
   padding-bottom: 8px;
 }
 
 .transaction-row:not(.header):hover {
-  background: #f8fafc;
+  background: var(--bg);
 }
 
 .tx-filters {
@@ -37,7 +37,8 @@
   padding: 6px 12px;
   border-radius: 999px;
   font-size: 12px;
-  background: #f1f5f9;
+  background: var(--chat-user-bg);
+  color: var(--chat-user-text);
   border: none;
   cursor: pointer;
 }
@@ -133,7 +134,7 @@
   align-items: center;
 
   padding: 10px 6px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .transaction-row:last-child {
@@ -151,7 +152,7 @@
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: #fff;
+  background: var(--chat-bot-bg);
   box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 
   display: flex;
@@ -159,7 +160,7 @@
   justify-content: center;
 
   font-weight: 500;
-  color: #334155;
+  color: var(--chat-bot-text);
 }
 
 .tx-title {

@@ -7,6 +7,13 @@ import './TransactionList.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
+function SortIcon({ active, dir }) {
+  if (!active) return <FiChevronUp opacity={0.3} size={14} />
+  return dir === 'asc'
+    ? <FiChevronUp size={14} />
+    : <FiChevronDown size={14} />
+}
+
 export default function TransactionList(){
   const [items, setItems] = useState([])
   const [filter, setFilter] = useState('ALL')
@@ -50,13 +57,6 @@ export default function TransactionList(){
       key,
       dir: prev.key === key && prev.dir === 'desc' ? 'asc' : 'desc'
     }))
-  }
-
-  function SortIcon({ active, dir }) {
-    if (!active) return <FiChevronUp opacity={0.3} size={14} />
-    return dir === 'asc'
-      ? <FiChevronUp size={14} />
-      : <FiChevronDown size={14} />
   }
 
   return (
