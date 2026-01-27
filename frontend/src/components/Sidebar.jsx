@@ -4,8 +4,6 @@ import {
   FiUsers,
   FiBarChart2,
   FiBell,
-  FiHelpCircle,
-  FiSettings,
   FiChevronRight
 } from 'react-icons/fi'
 import { GoCreditCard, GoGoal, GoTrophy } from 'react-icons/go'
@@ -30,15 +28,6 @@ function NavItem({ icon: Icon, label, to, expanded }) {
       </div>
       {expanded && <div className="nav-label">{label}</div>}
     </NavLink>
-  )
-}
-
-function FooterItem({ icon: Icon, label, expanded }) {
-  return (
-    <div className="footer-action">
-      <Icon size={16} />
-      {expanded && <div className="footer-label">{label}</div>}
-    </div>
   )
 }
 
@@ -83,10 +72,6 @@ export default function Sidebar({ expanded, onToggle }) {
 
       {/* Footer */}
       <div className="sidebar-footer">
-        <div className="footer-actions">
-          <FooterItem icon={FiHelpCircle} label="Help" expanded={expanded} />
-          <FooterItem icon={FiSettings} label="Settings" expanded={expanded} />
-        </div>
         <ProfileItem expanded={expanded} />
       </div>
     </aside>

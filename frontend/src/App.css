@@ -326,9 +326,9 @@ input::placeholder {
 .glass { backdrop-filter: blur(6px); background: var(--glass); border-radius: var(--radius); }
 
 /* Sidebar collapsed helpers */
-.sidebar.collapsed .nav-label { display: none; }
+/* .sidebar.collapsed .nav-label { display: none; }
 .sidebar.collapsed .brand { display: none; }
-.sidebar.collapsed .sidebar-footer { display: none; }
+.sidebar.collapsed .sidebar-footer { display: none; } */
 
 /* Focus Styles for Accessibility */
 .icon-btn:focus-visible,

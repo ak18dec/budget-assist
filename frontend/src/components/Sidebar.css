@@ -135,10 +135,6 @@
   height: 28px;
 }
 
-.sidebar.collapsed .nav-label {
-  display: none;
-}
-
 /* ---------------- Footer ---------------- */
 
 .sidebar-footer {
@@ -169,16 +165,12 @@
 }
 
 .footer-label {
-  font-size: 13px;
+  font-size: 15px;
 }
 
 /* Footer collapsed behavior */
-.sidebar.collapsed .footer-action {
+.sidebar.collapsed {
   justify-content: center;
-}
-
-.sidebar.collapsed .footer-label {
-  display: none;
 }
 
 /* ---------------- Profile ---------------- */
@@ -214,10 +206,3 @@
 .sidebar.collapsed .profile {
   justify-content: center;
 }
-
-.sidebar.collapsed .profile-meta,
-.sidebar.collapsed .chev {
-  display: none;
-}
-
-
