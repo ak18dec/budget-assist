@@ -31,7 +31,7 @@ def _extract_amount(text: str) -> Optional[float]:
 def _extract_date(text: str) -> Optional[str]:
     try:
         dt = dateparser.parse(text, fuzzy=True, default=None)
-        if dt:
+        if dt and dt.year > 2000:
             return dt.date().isoformat()
     except Exception:
         return None
@@ -64,6 +64,15 @@ def classify_intent(message: str) -> Dict[str, Any]:
         intent = "ask_goal_progress"
     elif any(w in lower for w in ["spend", "spent", "summary", "how much", "forecast", "predict"]):
         intent = "ask_spending_summary"
+    elif any(w in lower for w in ["show", "list"]) and "transaction" in lower:
+        intent = "show_transactions"
+    elif any(w in lower for w in ["goal", "goals"]):
+        intent = "show_goals"
+    elif any(w in lower for w in ["budget", "budgets"]):
+        intent = "show_budgets"
+    elif any(w in lower for w in ["doing", "track", "month", "okay", "status"]):
+        intent = "health_check"
+
 
     entities: Dict[str, Any] = {}
     amt = _extract_amount(message)

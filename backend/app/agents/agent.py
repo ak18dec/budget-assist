@@ -14,6 +14,15 @@ def _choose_and_call(intent_result: Dict[str, Any]) -> Dict[str, Any]:
         return {"tool": "get_goal_status", "result": tools.get_goal_status_tool(entities)}
     if intent == "ask_spending_summary":
         return {"tool": "predict_cashflow", "result": tools.predict_cashflow_tool(entities)}
+    if intent == "show_transactions":
+        return {"tool": "list_transactions", "result": tools.list_transactions_tool()}
+    if intent == "show_budgets":
+        return {"tool": "get_budget_status", "result": tools.get_budget_status_tool()}
+    if intent == "show_goals":
+        return {"tool": "get_goal_status", "result": tools.get_goal_status_tool()}
+    if intent == "health_check":
+        return {"tool": "financial_health", "result": tools.financial_health_tool()}
+
     return {"tool": "none", "result": {"ok": False, "message": "unknown intent"}}
 
 
@@ -54,6 +63,42 @@ def run_agent(message: str) -> Dict[str, Any]:
             week = result.get("next_week_estimate")
             month = result.get("next_30_estimate")
             text = f"Estimated next week spend: ${week:.2f}. Next 30 days: ${month:.2f}."
+    elif tool == "list_transactions":
+        txs = result.get("transactions", [])
+        if not txs:
+            text = "You have no transactions yet."
+        else:
+            lines = [
+                f"${t['amount']} on {t['category']} ({t['date']})"
+                for t in txs[-5:]
+            ]
+            text = "Here are your recent transactions:\n" + "\n".join(lines)
+    elif tool == "financial_health":
+        summary = result["summary"]
+        budgets = result["budgets"]
+        goals = result["goals"]
+
+        total_expense = summary['total_expense']
+        avg_daily = total_expense / 30
+
+        text = (
+            f"This month you’ve spent ${total_expense:.2f}. "
+            f"Your average daily spend is ${avg_daily:.2f}.\n"
+        )
+
+        if budgets:
+            off_track = [b for b in budgets if b["remaining"] < 0]
+            if off_track:
+                text += "⚠️ Some budgets are over limit.\n"
+            else:
+                text += "✅ Your budgets look on track.\n"
+
+        if goals:
+            slow = [g for g in goals if g["progress"] < 0.5]
+            if slow:
+                text += "Some goals may need more contributions."
+            else:
+                text += "Your goals are progressing well."
     else:
         text = "Sorry, I couldn't determine an action for that request."
 

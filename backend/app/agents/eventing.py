@@ -9,6 +9,8 @@ alerts and does not perform funds movement.
 from typing import Callable, Dict, Any, List
 from threading import Lock
 from app.agents import notifier
+from app.agents.tools import predict_cashflow_tool
+from app import storage
 
 _handlers: Dict[str, List[Callable[[Dict[str, Any]], Any]]] = {}
 _lock = Lock()
@@ -58,8 +60,6 @@ def new_transaction_handler(payload: Dict[str, Any]):
 
 def daily_check_handler(_: Dict[str, Any]):
     # Example daily check: predict cashflow and warn if next week estimate exceeds 75% of combined budgets
-    from app.agents.tools import predict_cashflow_tool
-    from app import storage
     pred = predict_cashflow_tool()
     total_budgets = sum(b.amount for b in storage.budgets) or 1
     est_week = pred.get("next_week_estimate", 0)

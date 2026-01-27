@@ -20,7 +20,7 @@ def add_transaction_tool(entities: Dict[str, Any]) -> Dict[str, Any]:
     d = _parse_date(entities.get("date"))
     if amount is None:
         return {"error": "missing amount"}
-    tx_base = models.TransactionBase(amount=float(amount), category=category, date=d)
+    tx_base = models.TransactionBase(amount=float(amount), category=category, date=d, type=models.TransactionType.EXPENSE)
     tx = storage.add_transaction(tx_base)
     return {"ok": True, "transaction": tx.model_dump()}
 
@@ -35,8 +35,8 @@ def get_budget_status_tool(_: Dict[str, Any] = None) -> Dict[str, Any]:
         for t in storage.transactions:
             if budget_name and budget_name in (t.category or "").lower():
                 spent += t.amount
-        remaining = b.amount - spent
-        data.append({"id": b.id, "name": b.name, "amount": b.amount, "spent": spent, "remaining": remaining})
+        remaining = b.monthly_limit - spent
+        data.append({"id": b.id, "name": b.name, "amount": b.monthly_limit, "spent": spent, "remaining": remaining})
     return {"ok": True, "budgets": data}
 
 
@@ -86,3 +86,29 @@ def predict_cashflow_tool(_: Dict[str, Any] = None) -> Dict[str, Any]:
         by_cat[k] = {"total": by_cat[k], "avg_daily": by_cat[k] / span_days}
 
     return {"ok": True, "avg_daily": avg_daily, "next_week_estimate": next_week, "next_30_estimate": next_30, "by_category": by_cat}
+
+
+def list_transactions_tool(_: Dict[str, Any] = None):
+    return {
+        "ok": True,
+        "transactions": [
+            {
+                "amount": t.amount,
+                "category": t.category,
+                "date": t.date.isoformat()
+            }
+            for t in storage.transactions
+        ]
+    }
+
+def financial_health_tool(_: Dict[str, Any] = None):
+    summary = storage.get_financial_summary()
+    budgets = get_budget_status_tool().get("budgets", [])
+    goals = get_goal_status_tool().get("goals", [])
+
+    return {
+        "ok": True,
+        "summary": summary.dict(),
+        "budgets": budgets,
+        "goals": goals,
+    }
