@@ -15,11 +15,82 @@ const DUMMY_GOALS = [
 ]
 
 const goalIcons = {
+  // 🎓 Education
   education: GoMortarBoard,
+  study: GoMortarBoard,
+  studies: GoMortarBoard,
+  college: GoMortarBoard,
+  university: GoMortarBoard,
+  school: GoMortarBoard,
+  tuition: GoMortarBoard,
+  exam: GoMortarBoard,
+  course: GoMortarBoard,
+
+  // 🏖 Retirement / long-term
   retirement: FiGift,
+  retire: FiGift,
+  pension: FiGift,
+  oldage: FiGift,
+  old: FiGift,
+  future: FiGift,
+
+  // 🚨 Emergency / safety
   emergency: FiActivity,
+  medical: FiActivity,
+  health: FiActivity,
+  hospital: FiActivity,
+  accident: FiActivity,
+  insurance: FiActivity,
+  safety: FiActivity,
+
+  // 🚗 Vehicle
   car: IoCarOutline,
+  vehicle: IoCarOutline,
+  bike: IoCarOutline,
+  motorcycle: IoCarOutline,
+  scooter: IoCarOutline,
+  auto: IoCarOutline,
+
+  // 🏠 Home
+  home: FiActivity,
+  house: FiActivity,
+  rent: FiActivity,
+  apartment: FiActivity,
+  flat: FiActivity,
+  mortgage: FiActivity,
+  property: FiActivity,
+
+  // ✈️ Travel / lifestyle
+  travel: FiGift,
+  trip: FiGift,
+  vacation: FiGift,
+  holiday: FiGift,
+  tour: FiGift,
+
+  // 💻 Tech / gadgets
+  laptop: FiActivity,
+  phone: FiActivity,
+  mobile: FiActivity,
+  gadget: FiActivity,
+  electronics: FiActivity,
+
+  // 💍 Personal milestones
+  wedding: FiGift,
+  marriage: FiGift,
+  engagement: FiGift,
+  honeymoon: FiGift,
+  baby: FiGift,
+  child: FiGift,
+
+  // 💰 Finance-specific
+  savings: FiActivity,
+  save: FiActivity,
+  investment: FiActivity,
+  invest: FiActivity,
+  fund: FiActivity,
+  wealth: FiActivity,
 }
+
 
 function pct(g){ return Math.round((g.saved_amount / g.target_amount)*100) }
 
@@ -34,8 +105,11 @@ export default function SavingsList(){
         const g = res.data?.goals || []
         g.forEach(g=>{
           if(!g.icon){
-            const key = g.name.toLowerCase()
-            g.icon = goalIcons[key] || FiActivity
+            const goalName = g.name.toLowerCase()
+            const matchedKey = Object.keys(goalIcons).find(key => goalName.includes(key))
+            console.log(matchedKey)
+            g.icon = goalIcons[matchedKey] || FiActivity
+            g.color = 'var(--accent)'
           }
         })
         if(mounted && g.length) setGoals(g)
@@ -52,7 +126,7 @@ export default function SavingsList(){
       <div style={{display:'grid', gap:12}}>
         {(goals||[]).map(g=> (
           <div key={g.id} style={{display:'flex', alignItems:'center', gap:12}}>
-            <div style={{width:44, height:44, background:'var(--window)', borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 2px rgba(0,0,0,0.03)'}}>
+            <div style={{width:44, height:44, background:'var(--chat-bot-bg)', borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 2px rgba(0,0,0,0.04)', color: 'var(--chat-bot-text)'}}>
               <g.icon size={20} style={{color:g.color||'var(--border-lighter)'}} />
             </div>
             <div style={{flex:1}}>

@@ -22,7 +22,7 @@ function Sparkline({points = [], color = '#10b981'}){
 }
 
 const SummaryCard = ({title, value, delta, positive=true, color, points}) => (
-  <div className="summary-card">
+  <div className="card summary-card">
     <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', height:'100%'}}>
       <div style={{display:'flex', flexDirection:'column', gap:10}}>
         <div className="small-icon" style={{background:'rgba(59,130,246,0.06)'}}>

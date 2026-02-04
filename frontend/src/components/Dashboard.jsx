@@ -22,7 +22,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="card" style={{ marginBottom: 12 }}>
+      <div style={{ marginBottom: 12 }}>
         <SummaryCards />
       </div>
 
