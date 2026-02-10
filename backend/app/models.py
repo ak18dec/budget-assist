@@ -2,6 +2,8 @@ from enum import Enum
 from pydantic import BaseModel, Field, field_validator, computed_field
 from typing import Optional, List
 from datetime import date, datetime
+import uuid
+
 
 class TransactionType(str, Enum):
     EXPENSE = 'EXPENSE'
@@ -82,6 +84,18 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     response: str
+    tool: Optional[str] = None
+    tool_result: Optional[dict] = None
+    intent: Optional[dict] = None
+    context_used: Optional[List[str]] = None
+    timestamp: datetime = Field(default_factory=datetime.now)
+
+
+class ConversationTurn(BaseModel):
+    """Represents a single turn in a conversation."""
+    role: str  # "user" or "assistant"
+    content: str
+    timestamp: datetime = Field(default_factory=datetime.now)
 
 
 class IntentResponse(BaseModel):

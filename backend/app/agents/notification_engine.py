@@ -1,23 +1,26 @@
-from typing import List
+from typing import List, Dict, Any
 from app.storage import (
-    add_notification, 
-    transactions, 
-    get_budget_spending, 
-    get_goals_due_between, 
+    add_notification,
+    transactions,
+    get_budget_spending,
+    get_goals_due_between,
     get_balance
 )
 from datetime import date, timedelta
 from app.agents import eventing
 from app.models import Goal, Transaction
+import logging
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------
 # Event Handlers
 # ---------------------------
 
-def on_transaction_created(tx: Transaction):
-    print("🟢 on_transaction_created called", tx)
+def on_transaction_created(payload: Dict[str, Any]):
     """
     Handle transaction.created events.
+    Receives a dict payload with transaction data.
     Rules:
     1. Transaction > 500 → notify
     2. Budget threshold reached → notify
@@ -25,29 +28,33 @@ def on_transaction_created(tx: Transaction):
     4. Balance negative → notify
     """
 
+    tx = payload
+    logger.info(f"Processing transaction created event: {tx}")
+
     # 1 Large transaction rule
     if tx.get("amount", 0) > 500:
-        print("⚠️A large transaction is recorded...")
+        logger.warning("⚠️ Large transaction recorded")
         add_notification(
             notification_type="transaction.large",
             title="Large Transaction",
             message=f"A transaction of {tx['amount']} was added in {tx.get('category', 'Unknown')}"
         )
-    
+
     # 2 Budget threshold / exceeded rules
     category = tx.get("category")
     if category:
         spending, limit, alert_threshold = get_budget_spending(category)
         # alert threshold (e.g., 80%)
         if spending >= alert_threshold * limit:
+            logger.info(f"Budget threshold reached for {category}")
             add_notification(
                 notification_type="budget.threshold",
                 title=f"{category} Budget Alert",
                 message=f"Your spending has reached {spending}/{limit} ({spending/limit*100:.0f}%)"
-                # f"{tx['category']} budget has reached {int(percent)}%"
             )
         # exceeded limit
         if spending >= limit:
+            logger.warning(f"Budget exceeded for {category}")
             add_notification(
                 notification_type="budget.exceeded",
                 title=f"{category} Budget Exceeded",
@@ -57,6 +64,7 @@ def on_transaction_created(tx: Transaction):
     # 4 Balance negative
     balance = get_balance()
     if balance < 0:
+        logger.error(f"Negative balance detected: {balance}")
         add_notification(
             notification_type="balance.negative",
             title="Negative Balance",
@@ -142,6 +150,6 @@ def check_negative_balance():
 # Register handlers
 # ---------------------------
 def setup_event_handlers():
-    print("✅ Registering notification event handlers")
+    logger.info("Registering notification event handlers")
     eventing.register("transaction.created", on_transaction_created)
     eventing.register("goal.check_due", on_goal_due_check)

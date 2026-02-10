@@ -11,6 +11,8 @@ from typing import List, Dict, Any
 import re
 import logging
 
+logger = logging.getLogger(__name__)
+
 try:
     import chromadb
     from chromadb.utils import embedding_functions
@@ -101,11 +103,140 @@ def add_financial_docs(docs: List[Dict[str, Any]]):
         _DOC_STORE.add_document(d.get("id"), d.get("text"), d.get("metadata"))
 
 
-def retrieve_context(query: str, k: int = 3) -> str:
+def retrieve_context(query: str, k: int = 3) -> List[Dict[str, Any]]:
+    """
+    Retrieve relevant documents matching the query.
+    Returns list of dicts with 'id', 'text', and 'metadata' keys.
+    """
     hits = _DOC_STORE.retrieve(query, k=k)
+    return hits
+
+
+def initialize_with_financial_data():
+    """
+    Populate RAG with current financial data from storage.
+    Called at app startup to seed the vector DB.
+    """
+    from app import storage
+
+    docs_to_add = []
+
+    logger.info("Initializing RAG with financial data...")
+
+    # Add budgets as documents
+    for budget in storage.budgets:
+        doc_id = f"budget_{budget.id}"
+        text = (
+            f"Budget: {budget.name}. "
+            f"Monthly limit: ${budget.monthly_limit}. "
+            f"Alert threshold: {budget.alert_threshold * 100:.0f}%. "
+            f"Category: {getattr(budget, 'category', budget.name)}"
+        )
+        docs_to_add.append({
+            "id": doc_id,
+            "text": text,
+            "metadata": {
+                "type": "budget",
+                "budget_id": budget.id,
+                "name": budget.name,
+                "category": getattr(budget, 'category', budget.name)
+            }
+        })
+
+    # Add goals as documents
+    for goal in storage.goals:
+        doc_id = f"goal_{goal.id}"
+        text = (
+            f"Goal: {goal.name}. "
+            f"Target amount: ${goal.target_amount}. "
+            f"Currently saved: ${goal.saved_amount}. "
+            f"Progress: {goal.saved_amount/goal.target_amount*100:.0f}%"
+        )
+        if goal.target_date:
+            text += f". Target date: {goal.target_date}"
+
+        docs_to_add.append({
+            "id": doc_id,
+            "text": text,
+            "metadata": {
+                "type": "goal",
+                "goal_id": goal.id,
+                "name": goal.name,
+                "target_date": str(goal.target_date) if goal.target_date else None
+            }
+        })
+
+    # Add financial summary as a document
+    summary = storage.get_financial_summary()
+    text = (
+        f"Financial summary: "
+        f"Total income: ${summary.total_income}. "
+        f"Total expenses: ${summary.total_expense}. "
+        f"Balance: ${summary.total_balance}. "
+        f"Number of transactions: {summary.transactions_count}"
+    )
+    docs_to_add.append({
+        "id": "summary_current",
+        "text": text,
+        "metadata": {
+            "type": "summary",
+            "total_income": summary.total_income,
+            "total_expense": summary.total_expense,
+            "total_balance": summary.total_balance
+        }
+    })
+
+    # Add default financial rules/policies
+    docs_to_add.append({
+        "id": "rule_budget_threshold",
+        "text": "Budget alerts are triggered when spending reaches the alert threshold (typically 80% of limit). "
+                "Critical alerts when spending exceeds the budget limit.",
+        "metadata": {"type": "rule", "name": "budget_threshold"}
+    })
+
+    docs_to_add.append({
+        "id": "rule_transaction_alerts",
+        "text": "Large transactions over $500 trigger notifications. "
+                "You are also alerted if your balance goes negative.",
+        "metadata": {"type": "rule", "name": "transaction_alerts"}
+    })
+
+    if docs_to_add:
+        add_financial_docs(docs_to_add)
+        logger.info(f"Initialized RAG with {len(docs_to_add)} documents")
+
+def sync_financial_data():
+    """
+    Refresh RAG with latest financial data.
+    Call after budget/goal updates to keep context fresh.
+    """
+    # For now, we reinitialize. In production, could do partial updates.
+    logger.info("Syncing financial data to RAG...")
+    initialize_with_financial_data()
+
+
+def format_context_for_prompt(documents: List[Dict[str, Any]]) -> str:
+    """
+    Format retrieved documents into a readable context string for LLM prompt.
+    """
+    if not documents:
+        return ""
+
     pieces = []
-    for h in hits:
-        text = h.get("text") if isinstance(h.get("text"), str) else (h.get("documents") if h.get("documents") else "")
-        pieces.append(f"- {h.get('id')}: {text[:200]}")
+    for doc in documents:
+        text = doc.get("text", "")
+        pieces.append(f"- {text}")
+
     return "\n".join(pieces)
+
+
+def retrieve_and_format_context(query: str, k: int = 3) -> tuple[str, List[str]]:
+    """
+    Retrieve documents and format them for LLM prompt.
+    Returns (formatted_context_string, list_of_doc_ids)
+    """
+    docs = retrieve_context(query, k=k)
+    context_str = format_context_for_prompt(docs)
+    doc_ids = [d.get("id") for d in docs]
+    return context_str, doc_ids
 

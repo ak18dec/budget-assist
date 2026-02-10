@@ -68,11 +68,17 @@ def classify_intent(message: str) -> Dict[str, Any]:
     intent = "unknown"
     entities: Dict[str, Any] = {}
 
+    # --- Check spending ability (can I afford/spend) --- #
+    if any(w in lower for w in ["can i", "can i spend", "can i afford", "should i", "would i"]):
+        if any(w in lower for w in ["spend", "afford", "pay"]):
+            intent = "check_spending_ability"
+
     # --- Goal contribution --- #
-    goal_name = _extract_goal_name(message)
-    if goal_name:
-        intent = "add_goal_contribution"
-        entities["goal_name"] = goal_name
+    elif any(w in lower for w in ["save", "save to", "contribute to"]) and "goal" in lower:
+        goal_name = _extract_goal_name(message)
+        if goal_name:
+            intent = "add_goal_contribution"
+            entities["goal_name"] = goal_name
 
     # --- Transaction fallback --- #
     elif any(w in lower for w in ["add", "spent", "bought", "purchase", "pay", "paid"]):
@@ -83,7 +89,7 @@ def classify_intent(message: str) -> Dict[str, Any]:
     # --- Budget / goals queries --- #
     elif "budget" in lower:
         intent = "ask_budget_status"
-    elif any(w in lower for w in ["goal", "saving", "save"]):
+    elif any(w in lower for w in ["goal", "saving"]):
         intent = "ask_goal_progress"
     elif any(w in lower for w in ["spend", "spent", "summary", "how much", "forecast", "predict"]):
         intent = "ask_spending_summary"
@@ -94,7 +100,13 @@ def classify_intent(message: str) -> Dict[str, Any]:
     dt = _extract_date(message)
     if dt is not None:
         entities["date"] = dt
-    
+
+    # For check_spending_ability, also extract category
+    if intent == "check_spending_ability":
+        cat = _extract_category(message)
+        if cat:
+            entities["category"] = cat
+
     return {"intent": intent, "entities": entities}
     
     # elif any(w in lower for w in ["show", "list"]) and "transaction" in lower:

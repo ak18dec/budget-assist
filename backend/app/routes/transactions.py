@@ -3,6 +3,9 @@ from typing import List
 from app import storage
 from app import models
 from app.agents import eventing
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -20,11 +23,11 @@ def create_transaction(tx: models.TransactionBase):
         "description": created.description,
     }
 
-    print("🔥 Emitting transaction.created event", created)
-    
+    logger.info(f"Emitting transaction.created event for transaction {created.id}")
+
     # Emit event for new transaction
     eventing.emit("transaction.created", payload)
-    
+
     return created
 
 

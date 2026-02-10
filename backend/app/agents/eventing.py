@@ -11,6 +11,9 @@ from threading import Lock
 from app.agents import notifier
 from app.agents.tools import predict_cashflow_tool
 from app import storage
+import logging
+
+logger = logging.getLogger(__name__)
 
 _handlers: Dict[str, List[Callable[[Dict[str, Any]], Any]]] = {}
 _lock = Lock()
@@ -19,18 +22,20 @@ _lock = Lock()
 def register(event_name: str, handler: Callable[[Dict[str, Any]], Any]):
     with _lock:
         _handlers.setdefault(event_name, []).append(handler)
+        logger.debug(f"Registered handler for event: {event_name}")
 
 
 def emit(event_name: str, payload: Dict[str, Any]):
-    print(f"📣 Event emitted: {event_name}", payload)
+    logger.info(f"Event emitted: {event_name}")
     handlers = _handlers.get(event_name, [])
-    print(f"👂 Handlers found: {len(handlers)}")
+    logger.debug(f"Found {len(handlers)} handlers for {event_name}")
     results = []
     all_alerts = []
     for h in handlers:
         try:
             results.append(h(payload))
         except Exception as e:
+            logger.error(f"Error in handler for {event_name}: {e}")
             results.append({"error": str(e)})
     # collect alerts from handlers and deliver via notifier
     for r in results:
