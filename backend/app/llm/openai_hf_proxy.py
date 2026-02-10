@@ -2,6 +2,7 @@ import os
 from typing import Dict, Any
 from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
+import json
 
 load_dotenv()
 
@@ -13,21 +14,51 @@ client = InferenceClient(
     model=HF_MODEL,
 )
 
-def _build_prompt(message: str, summary: Dict[str, Any]) -> str:
-    return (
-        "You are a helpful financial assistant.\n\n"
-        f"User financial summary:\n"
-        f"- Total spent: ${summary['total_expense']:.2f}\n\n"
-        f"User question:\n{message}\n\n"
-        "Answer concisely and helpfully."
+# --- Prompt builder for structured JSON output --- #
+def _build_structured_prompt(message: str, summary: Dict[str, Any]) -> str:
+    """
+    Instruct the LLM to always output JSON with:
+    {
+        "intent": "...",
+        "amount": ...,
+        "category": "...",
+        "goal_name": "...",
+        "date": "YYYY-MM-DD"
+    }
+    Fill missing fields with null if not applicable.
+    """
+    prompt = (
+        "You are a helpful financial assistant.\n"
+        "User's financial summary:\n"
+        f"- Total spent: ${summary.get('total_expense', 0):.2f}\n"
+        f"- Total saved: ${summary.get('total_balance', 0):.2f}\n\n"
+        "Instruction:\n"
+        "1. Identify the user's intent (expense, income, goal contribution, budget query, goal query, cashflow prediction).\n"
+        "2. Extract relevant entities: amount, category, goal_name, date.\n"
+        "3. Output ONLY JSON, no text, no explanations.\n"
+        "4. Use null for missing fields.\n\n"
+        f"User message: \"{message}\"\n\n"
+        "Example JSON format:\n"
+        "{\n"
+        '  "intent": "add_goal_contribution",\n'
+        '  "amount": 100,\n'
+        '  "category": null,\n'
+        '  "goal_name": "vacation",\n'
+        '  "date": "2026-01-27"\n'
+        "}"
     )
+    return prompt
 
-
-async def generate_chat_response(
+# --- Generate structured JSON response --- #
+async def extract_intent(
     message: str,
     summary: Dict[str, Any],
 ) -> str:
-    prompt = _build_prompt(message, summary)
+    """
+    Call the LLM and parse structured JSON output.
+    Fallback to minimal safe defaults if parsing fails.
+    """
+    prompt = _build_structured_prompt(message, summary)
 
     try:
         completion = client.chat.completions.create(
@@ -38,7 +69,27 @@ async def generate_chat_response(
                 }
             ],
         )
-        return completion.choices[0].message["content"].strip()
+        content = completion.choices[0].message["content"].strip()
+
+        # Attempt JSON parsing
+        try:
+            data = json.loads(content)
+        except Exception:
+            data = {}
+        
+        # Ensure keys exist
+        return {
+            "intent": data.get("intent", "unknown"),
+            "entities": {
+                "amount": data.get("amount"),
+                "category": data.get("category"),
+                "goal_name": data.get("goal_name"),
+                "date": data.get("date")
+            }
+        }
     except Exception as e:
         print(f"Error during HF LLM call: {e}")
-        return "Sorry, I couldn't generate a response."
+        return {
+            "intent": "unknown",
+            "entities": {"amount": None, "category": None, "goal_name": None, "date": None}
+        }

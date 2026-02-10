@@ -15,7 +15,7 @@ COMMON_CATEGORIES = [
     "misc",
 ]
 
-
+# --- Fallback local extraction for safety --- #
 def _extract_amount(text: str) -> Optional[float]:
     # matches $12.50 or 12.50 or 1,200.00
     m = re.search(r"\$?([0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]+)?|[0-9]+(?:\.[0-9]+)?)", text)
@@ -52,37 +52,56 @@ def _extract_category(text: str) -> Optional[str]:
             return c
     return None
 
+def _extract_goal_name(text: str) -> Optional[str]:
+    m = re.search(r"(?:to|into|for)\s+([a-zA-Z\s]+?)\s+goal", text.lower())
+    if m:
+        return m.group(1).strip()
+    return None
 
+# --- Main intent classifier (fallback if LLM fails) --- #
 def classify_intent(message: str) -> Dict[str, Any]:
+    """
+    Fallback classifier using simple deterministic rules.
+    This is only used if LLM fails or is disabled.
+    """
     lower = message.lower()
     intent = "unknown"
-    if any(w in lower for w in ["add", "spent", "bought", "purchase", "pay", "paid"]):
+    entities: Dict[str, Any] = {}
+
+    # --- Goal contribution --- #
+    goal_name = _extract_goal_name(message)
+    if goal_name:
+        intent = "add_goal_contribution"
+        entities["goal_name"] = goal_name
+
+    # --- Transaction fallback --- #
+    elif any(w in lower for w in ["add", "spent", "bought", "purchase", "pay", "paid"]):
         intent = "add_transaction"
+        cat = _extract_category(message)
+        if cat:
+            entities["category"] = cat
+    # --- Budget / goals queries --- #
     elif "budget" in lower:
         intent = "ask_budget_status"
     elif any(w in lower for w in ["goal", "saving", "save"]):
         intent = "ask_goal_progress"
     elif any(w in lower for w in ["spend", "spent", "summary", "how much", "forecast", "predict"]):
         intent = "ask_spending_summary"
-    elif any(w in lower for w in ["show", "list"]) and "transaction" in lower:
-        intent = "show_transactions"
-    elif any(w in lower for w in ["goal", "goals"]):
-        intent = "show_goals"
-    elif any(w in lower for w in ["budget", "budgets"]):
-        intent = "show_budgets"
-    elif any(w in lower for w in ["doing", "track", "month", "okay", "status"]):
-        intent = "health_check"
-
-
-    entities: Dict[str, Any] = {}
+    # --- Extract common entities --- #
     amt = _extract_amount(message)
     if amt is not None:
         entities["amount"] = amt
-    cat = _extract_category(message)
-    if cat is not None:
-        entities["category"] = cat
     dt = _extract_date(message)
     if dt is not None:
         entities["date"] = dt
-
+    
     return {"intent": intent, "entities": entities}
+    
+    # elif any(w in lower for w in ["show", "list"]) and "transaction" in lower:
+    #     intent = "show_transactions"
+    # elif any(w in lower for w in ["goal", "goals"]):
+    #     intent = "show_goals"
+    # elif any(w in lower for w in ["budget", "budgets"]):
+    #     intent = "show_budgets"
+    # elif any(w in lower for w in ["doing", "track", "month", "okay", "status"]):
+    #     intent = "health_check"

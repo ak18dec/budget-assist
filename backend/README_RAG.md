@@ -33,3 +33,21 @@ Notes:
 - To use the Chroma backend, install dependencies from `requirements.txt` and ensure `chromadb` and `sentence-transformers` are available.
 - The included model is `all-MiniLM-L6-v2` from `sentence-transformers` (downloaded automatically).
 - For production embedding providers and vector DBs, consider OpenAI embeddings + managed vector DB (Pinecone/Weaviate/Chroma with persistence).
+
+
+
+Test Statements:
+ - Add 250 groceries today
+ - Add 120 coffee
+ - Show my transactions
+ - Show my budgets
+ - How am I doing this month?
+ - Are my goals on track?
+ - move extra money to savings
+ - can I add 5k to vacation?
+ - consent-based auto-allocation
+ - proper financial health analysis
+ - got refund 1200
+ - add bonus 10000 to vacation goal
+
+
