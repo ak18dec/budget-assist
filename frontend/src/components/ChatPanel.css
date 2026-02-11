@@ -297,3 +297,43 @@
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.message-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+
+/* Bot: left aligned */
+.chat-message.bot .message-meta {
+  justify-content: flex-start;
+}
+
+/* User: right aligned */
+.chat-message.user .message-meta {
+  justify-content: flex-end;
+}
+
+.copy-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.copy-button:hover {
+  color: var(--accent);
+}
+
+.copy-button svg {
+  width: 12px;
+  height: 12px;
+}

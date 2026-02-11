@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import "./ChatPanel.css";
 import { GoDependabot, GoTrash } from "react-icons/go";
-import { FiSend } from "react-icons/fi";
+import { FiSend, FiCopy, FiCheck } from "react-icons/fi";
+import { GoCopy, GoCheck } from "react-icons/go";
 import { fmtTime } from '../utils/Formatters.js'
 
 const API_URL = import.meta.env.VITE_API_URL || "";
@@ -38,6 +39,7 @@ export default function ChatPanel({ expanded, onToggle }) {
     const textareaRef = useRef(null);
     const [radius, setRadius] = useState(999);
     const [botTyping, setBotTyping] = useState(false)
+    const [copiedId, setCopiedId] = useState(null);
 
     useEffect(() => {
         const el = textareaRef.current;
@@ -89,6 +91,19 @@ export default function ChatPanel({ expanded, onToggle }) {
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    const handleCopy = async (text, id) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopiedId(id);
+
+            setTimeout(() => {
+                setCopiedId(null);
+            }, 1500);
+        } catch (err) {
+            console.error("Copy failed:", err);
+        }
     };
 
     useEffect(() => {
@@ -185,8 +200,16 @@ export default function ChatPanel({ expanded, onToggle }) {
                                     <div className="message-text">
                                         {message.text}
                                     </div>
-                                    <div className="message-time">
-                                        {fmtTime(message.timestamp)}
+                                    <div className="message-meta">
+                                        <div className="message-time">
+                                            {fmtTime(message.timestamp)}
+                                        </div>
+                                        <button
+                                            className="copy-button"
+                                            onClick={() => handleCopy(message.text, message.id)}
+                                        >
+                                            {copiedId === message.id ? <FiCheck /> : <FiCopy />}
+                                        </button>
                                     </div>
                                 </div>
                             </div>
