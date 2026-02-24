@@ -126,6 +126,7 @@ export default function ChatPanel({ expanded, onToggle }) {
 
         try {
             const res = await axios.post(`${API_URL}/chat/`, {
+                user_id: "123", // Replace with actual user ID if available
                 message: userMessage.text,
             });
 

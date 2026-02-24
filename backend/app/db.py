@@ -105,6 +105,22 @@ def init_db():
 
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created_at DESC);")
 
+    # -----------------------
+    # Conversations Table
+    # -----------------------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS conversations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        role TEXT NOT NULL CHECK(role IN ('user', 'assistant')),
+        content TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    
+    );
+    """)
+
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_conversations_user_time ON conversations(user_id, created_at DESC);")
+
     conn.commit()
     conn.close()
 

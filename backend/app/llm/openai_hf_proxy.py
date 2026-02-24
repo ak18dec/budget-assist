@@ -100,72 +100,151 @@ def extract_intent(
     conversation_history: str = "",
 ) -> str:
     """
-    Call the LLM and parse structured JSON output.
-    Returns JSON string (not dict) for proper handling in agent.py.
-    Fallback to minimal safe defaults if parsing fails.
-    Optionally uses RAG context and conversation history for policy-aware, contextual responses.
+    Calls HF LLM and guarantees strict structured JSON.
+    Returns JSON string.
     """
-    prompt = _build_structured_prompt(message, summary, rag_context, conversation_history)
+
+    prompt = _build_structured_prompt(
+        message,
+        summary,
+        rag_context,
+        conversation_history,
+    )
 
     try:
         completion = client.chat.completions.create(
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a JSON API. ALWAYS respond with ONLY valid JSON, nothing else. Do not include any text, explanations, or markdown. Just raw JSON."
+                    "content": (
+                        "You are a JSON API. "
+                        "ALWAYS respond with ONLY valid JSON. "
+                        "NO markdown. NO explanations. NO extra text."
+                    )
                 },
                 {
                     "role": "user",
                     "content": prompt
                 }
             ],
+            temperature=0,  # 🔒 deterministic intent classification
         )
+
         content = completion.choices[0].message["content"].strip()
 
-        # Clean up the response if it has markdown code blocks
-        if content.startswith("```json"):
+        # Remove markdown if present
+        if content.startswith("```"):
             content = content.replace("```json", "").replace("```", "").strip()
-        elif content.startswith("```"):
-            content = content.replace("```", "").strip()
 
         logger.debug(f"LLM raw response: {content[:200]}")
 
-        # Attempt JSON parsing
+        # Parse JSON safely
         try:
             data = json.loads(content)
-        except Exception as e:
-            logger.warning(f"Failed to parse LLM JSON response: {e}. Content: {content[:200]}")
-            # Try to extract JSON if there's extra text
+        except Exception:
             import re
-            json_match = re.search(r'\{.*\}', content, re.DOTALL)
-            if json_match:
-                try:
-                    data = json.loads(json_match.group())
-                except:
-                    data = {}
+            match = re.search(r"\{.*\}", content, re.DOTALL)
+            if match:
+                data = json.loads(match.group())
             else:
                 data = {}
 
-        # Ensure keys exist and return as JSON string
-        nested_entities = data.get("entities", {})
-        if not isinstance(nested_entities, dict):
-            nested_entities = {}
+        # --- Normalize and enforce structure ---
+        intent = data.get("intent", "unknown")
+
+        allowed_intents = {
+            "add_transaction",
+            "add_income",
+            "add_goal_contribution",
+            "ask_budget_status",
+            "ask_goal_progress",
+            "ask_total_spent",
+            "ask_spending_summary",
+            "check_spending_ability",
+            "financial_health_analysis",
+            "move_money",
+            "unknown"
+        }
+
+        if intent not in allowed_intents:
+            intent = "unknown"
+
+        entities = {
+            "amount": _safe_float(data.get("amount")),
+            "category": _safe_str(data.get("category")),
+            "goal_name": _safe_str(data.get("goal_name")),
+            "date": _safe_str(data.get("date")),
+        }
 
         result = {
-            "intent": data.get("intent", "unknown"),
-            "entities": {
-                "amount": data.get("amount", nested_entities.get("amount")),
-                "category": data.get("category", nested_entities.get("category")),
-                "goal_name": data.get("goal_name", nested_entities.get("goal_name")),
-                "date": data.get("date", nested_entities.get("date"))
-            }
+            "intent": intent,
+            "entities": entities,
+            "confidence": data.get("confidence", 0.0)
         }
-        logger.debug(f"LLM extracted intent: {result['intent']}")
+
+        logger.debug(f"Normalized intent: {result['intent']}")
+
         return json.dumps(result)
+
     except Exception as e:
         logger.error(f"Error during HF LLM call: {e}")
+
         fallback = {
             "intent": "unknown",
-            "entities": {"amount": None, "category": None, "goal_name": None, "date": None}
+            "entities": {
+                "amount": None,
+                "category": None,
+                "goal_name": None,
+                "date": None
+            },
+            "confidence": 0.0
         }
         return json.dumps(fallback)
+
+
+def _safe_float(value):
+    try:
+        return float(value) if value is not None else None
+    except:
+        return None
+
+
+def _safe_str(value):
+    if value is None:
+        return None
+    return str(value).strip()
+
+
+def call_llm(
+    system_prompt: str,
+    user_prompt: str,
+    temperature: float = 0.7,
+) -> str:
+    """
+    Generic LLM call for conversational responses,
+    insights explanations, and financial advice generation.
+    Returns plain text response.
+    """
+
+    try:
+        completion = client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            temperature=temperature,
+        )
+
+        content = completion.choices[0].message["content"].strip()
+
+        # Clean markdown blocks if model wraps response
+        if content.startswith("```"):
+            content = content.replace("```", "").strip()
+
+        logger.debug(f"LLM response: {content[:300]}")
+
+        return content
+
+    except Exception as e:
+        logger.error(f"Error during HF LLM call: {e}")
+        return "I'm currently unable to process that request. Please try again."

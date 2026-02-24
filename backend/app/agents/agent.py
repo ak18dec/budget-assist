@@ -1,365 +1,91 @@
-from typing import Dict, Any
-from app.agents import tools
-from app.agents.intent_classifier import classify_intent
-from app.llm.openai_hf_proxy import extract_intent
-import json
 import logging
-import re
-from app.repositories import summary_repo, goals_repo
+from typing import Dict, Any, Optional
 
+from app.agents.intent_classifier import classify_intent
+from app.agents.tool_router import execute_tool
+from app.agents.response_composer import compose_response
+from app.agents.insight_engine import generate_insights
 
 logger = logging.getLogger(__name__)
 
 
-# --- Safety validators for LLM outputs --- #
-def validate_transaction_entities(entities: Dict[str, Any]) -> bool:
-    """Ensure transaction entities are valid."""
-    return entities.get("amount") is not None
-
-def validate_goal_entities(entities: Dict[str, Any]) -> bool:
-    """Ensure goal exists for goal contribution."""
-    goal_name = entities.get("goal_name")
-    if not goal_name:
-        return False
-    return any(g.name.lower() == goal_name.lower() for g in goals_repo.list_goals())
-
-
-def _get_last_user_turn(conversation_history: str) -> str:
-    """Extract the latest user turn from formatted conversation history."""
-    if not conversation_history:
-        return ""
-    for line in reversed(conversation_history.splitlines()):
-        if line.startswith("User:"):
-            return line.split("User:", 1)[1].strip()
-    return ""
-
-
-def _apply_context_fallbacks(
-    message: str,
-    intent_result: Dict[str, Any],
-    conversation_history: str
-) -> Dict[str, Any]:
-    """
-    Improve intent/entity extraction for follow-up turns when LLM output is weak.
-    """
-    if not conversation_history:
-        return intent_result
-
-    entities = intent_result.get("entities") or {}
-    intent = intent_result.get("intent", "unknown")
-    message_lower = message.lower()
-    last_user_turn = _get_last_user_turn(conversation_history)
-
-    if not last_user_turn:
-        return intent_result
-
-    # If current turn is ambiguous, classify against previous user context.
-    looks_like_follow_up = any(
-        token in message_lower
-        for token in ["that", "this", "it", "more", "again", "same", "what about", "how much"]
-    )
-    if intent == "unknown" and looks_like_follow_up:
-        combined = classify_intent(f"{last_user_turn}. Follow-up request: {message}")
-        if combined.get("intent") != "unknown":
-            return combined
-
-    # For context-dependent follow-ups, borrow only entities required by the current intent.
-    required_entities_by_intent = {
-        "add_transaction": ["amount", "category"],
-        "add_income": ["amount"],
-        "add_goal_contribution": ["amount", "goal_name"],
-        "check_spending_ability": ["amount", "category"],
-    }
-    required_entities = required_entities_by_intent.get(intent, [])
-
-    if looks_like_follow_up and required_entities:
-        previous = classify_intent(last_user_turn)
-        previous_entities = previous.get("entities", {})
-        merged_entities = {
-            "amount": entities.get("amount") if entities.get("amount") is not None else previous_entities.get("amount"),
-            "category": entities.get("category") or previous_entities.get("category"),
-            "goal_name": entities.get("goal_name") or previous_entities.get("goal_name"),
-            "date": entities.get("date") or previous_entities.get("date"),
-        }
-        if all(merged_entities.get(key) is not None for key in required_entities):
-            return {"intent": intent, "entities": merged_entities}
-
-    return intent_result
-
-
-def _apply_explicit_transaction_override(message: str, intent_result: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    If user explicitly states a spend action, force transaction intent to avoid random tool routing.
-    """
-    lower = message.lower()
-    affordability_markers = ["can i", "can i afford", "should i", "would i", "is it okay to"]
-    if any(marker in lower for marker in affordability_markers):
-        return intent_result
-
-    explicit_spend_patterns = [
-        r"^\s*i\s+spent\b",
-        r"^\s*i\s+paid\b",
-        r"^\s*i\s+bought\b",
-        r"^\s*also\s+\$?\d+",
-        r"^\s*add\s+\$?\d",
-        r"^\s*log\s+\$?\d",
-        r"^\s*record\s+\$?\d",
-    ]
-    if not any(re.search(pattern, lower) for pattern in explicit_spend_patterns):
-        return intent_result
-
-    extracted = classify_intent(message)
-    entities = intent_result.get("entities", {})
-    extracted_entities = extracted.get("entities", {})
-    return {
-        "intent": "add_transaction",
-        "entities": {
-            # Prefer locally extracted entities from the current user message.
-            # This prevents LLM date hallucinations from overriding explicit relative dates.
-            "amount": extracted_entities.get("amount") if extracted_entities.get("amount") is not None else entities.get("amount"),
-            "category": extracted_entities.get("category") or entities.get("category"),
-            "goal_name": entities.get("goal_name"),
-            "date": extracted_entities.get("date") or entities.get("date"),
-        },
-    }
-
-
-def _handle_context_dependent_followup(
-    message: str,
-    conversation_history: str,
-    intent_result: Dict[str, Any]
-) -> str:
-    """
-    Detect if the user is asking a follow-up question about recent spending.
-    If so, extract the answer directly from conversation history instead of generic queries.
-
-    Examples:
-    - "How much did I spend?" after "I spent 100 on groceries" → Return "$100 on groceries"
-    - "What was that for?" → Return the category/details from previous message
-    """
-    if not conversation_history:
-        return ""
-
-    message_lower = message.lower()
-
-    # Check for follow-up spending questions
-    follow_up_patterns = [
-        "how much was that",
-        "what was the amount",
-        "what category was",
-        "what was that",
-        "that amount",
-        "that category",
-    ]
-
-    is_follow_up = any(pattern in message_lower for pattern in follow_up_patterns)
-
-    if not is_follow_up:
-        return ""
-
-    # Extract the most recent transactions from conversation history
-    # Look for lines that show spending amounts
-    lines = conversation_history.split('\n')
-
-    # Find the most recent user message that mentioned an amount (previous transaction)
-    for line in reversed(lines):
-        line_lower = line.lower()
-        # Look for patterns like "spent $100 on groceries"
-        if any(word in line_lower for word in ["spent", "purchased", "bought", "paid"]):
-            if "$" in line or line_lower.count("on") > 0:
-                # This line contains transaction info
-                return f"Based on our previous conversation, {line.strip()}"
-
-    # If we couldn't find specific transaction info, don't interfere
-    return ""
-
-
-# --- Core tool router --- #
-def _choose_and_call(intent_result: Dict[str, Any]) -> Dict[str, Any]:
-    intent = intent_result.get("intent")
-    entities = intent_result.get("entities", {})
-    if intent == "add_goal_contribution":
-        if not validate_goal_entities(entities):
-            return {"tool": "add_goal_contribution", "result": {"ok": False, "error": "Goal not found or missing"}}
-        return {"tool": "add_goal_contribution", "result": tools.add_goal_contribution_tool(entities)}
-
-    # --- Income --- #
-    if intent == "add_income":
-        if not validate_transaction_entities(entities):
-            return {"tool": "add_income", "result": {"ok": False, "error": "Missing amount"}}
-        return {"tool": "add_income", "result": tools.add_income_tool(entities)}
-
-    # --- Expense --- #
-    if intent == "add_transaction":
-        if not validate_transaction_entities(entities):
-            return {"tool": "add_transaction", "result": {"ok": False, "error": "Missing amount"}}
-        return {"tool": "add_transaction", "result": tools.add_transaction_tool(entities)}
-
-    # --- Queries --- #
-    if intent == "ask_budget_status":
-        return {"tool": "get_budget_status", "result": tools.get_budget_status_tool(entities)}
-    if intent == "ask_goal_progress":
-        return {"tool": "get_goal_status", "result": tools.get_goal_status_tool(entities)}
-    if intent == "ask_spending_summary":
-        return {"tool": "predict_cashflow", "result": tools.predict_cashflow_tool(entities)}
-    if intent == "ask_total_spent":
-        return {"tool": "get_total_spent", "result": tools.get_total_spent_tool(entities)}
-    if intent == "check_spending_ability":
-        return {"tool": "check_spending_ability", "result": tools.check_spending_ability_tool(entities)}
-
-    # --- Unknown --- #
-    return {"tool": "none", "result": {"ok": False, "message": "unknown intent"}}
-
-    # if intent == "show_transactions":
-    #     return {"tool": "list_transactions", "result": tools.list_transactions_tool()}
-    # if intent == "show_budgets":
-    #     return {"tool": "get_budget_status", "result": tools.get_budget_status_tool()}
-    # if intent == "show_goals":
-    #     return {"tool": "get_goal_status", "result": tools.get_goal_status_tool()}
-    # if intent == "health_check":
-    #     return {"tool": "financial_health", "result": tools.financial_health_tool()}
-
-    # return {"tool": "none", "result": {"ok": False, "message": "unknown intent"}}
-
+# -----------------------------------------------------
+# MAIN AGENT ENTRY POINT
+# -----------------------------------------------------
 
 def run_agent(
-    message: str,
-    use_llm: bool = True,
-    conversation_history: str = ""
+    user_input: str,
+    allow_tools: bool = True,
+    conversation_history: Optional[str] = None,
+    user_id: Optional[str] = None
 ) -> Dict[str, Any]:
     """
-    Main entry point for user message.
+    Core AI orchestration engine.
 
     Steps:
-    1. Extract intent + entities using LLM (with RAG + conversation context) or fallback to local classifier
-    2. Route to correct tool with validation
-    3. Synthesize response with context awareness
+    1. Intent detection
+    2. Tool execution (if applicable)
+    3. Insight generation
+    4. Response composition
     """
-    # Step 0: Retrieve RAG context
-    from app import rag
-    rag_context, context_doc_ids = rag.retrieve_and_format_context(message, k=3)
 
-    # Step 1: extract intent + entities
-    if use_llm:
-        # build minimal financial summary for LLM
-        summary = summary_repo.get_financial_summary().model_dump()
-        llm_output = extract_intent(message, summary, rag_context, conversation_history)
-        # Extract intent should now return JSON string correctly
-        try:
-            intent_result = json.loads(llm_output)
-        except Exception as e:
-            logger.warning(f"Failed to parse LLM output as JSON: {e}. Using fallback classifier.")
-            # fallback to local deterministic classifier
-            intent_result = classify_intent(message)
-    else:
-        intent_result = classify_intent(message)
+    try:
+        # --------------------------------------------
+        # 1️⃣ INTENT CLASSIFICATION
+        # --------------------------------------------
+        intent_result = classify_intent(user_input)
 
-    intent_result = _apply_explicit_transaction_override(message, intent_result)
-    intent_result = _apply_context_fallbacks(message, intent_result, conversation_history)
-    logger.info(f"Intent Results: {intent_result}")
+        intent = intent_result.get("intent")
+        entities = intent_result.get("entities", {})
 
-    # Step 1.5: Check if this is a follow-up question about recent spending
-    # If user asks context-dependent questions like "How much did I spend?", provide direct answer from history
-    follow_up_response = _handle_context_dependent_followup(message, conversation_history, intent_result)
-    if follow_up_response:
-        return {
-            "response": follow_up_response,
-            "intent": intent_result
-        }
+        logger.info(f"Intent detected: {intent}")
 
-    # Step 2: call the correct tool (sync, no await needed)
-    tool_call = _choose_and_call(intent_result)
-    tool = tool_call["tool"]
-    result = tool_call["result"]
+        tool_result = None
+        tool_name = None
 
-    # Step 3: synthesize user response
-    text = "Sorry, I couldn't determine an action for that request."
+        # --------------------------------------------
+        # 2️⃣ TOOL EXECUTION
+        # --------------------------------------------
+        if allow_tools:
+            tool_name, tool_result = execute_tool(
+                intent=intent,
+                entities=entities
+            )
 
-    if tool == "add_transaction":
-        if result.get("ok"):
-            tx = result.get("transaction")
-            # text = f"Added expense #{tx.get('id')}: ${tx.get('amount')} - {tx.get('category')} on {tx.get('date')}"
-            text = f"Expense of ₹{tx.get('amount')} added for {tx.get('date')} in category '{tx.get('category')}'."
+        # --------------------------------------------
+        # 3️⃣ INSIGHT GENERATION (Smart Layer)
+        # --------------------------------------------
+        insights = []
 
-        else:
-            text = f"Failed to add expense: {result.get('error') or result.get('message')}"
-    elif tool == "add_goal_contribution":
-        if result.get("ok"):
-            g = result.get("goal")
-            text = f"Added ${g.get('amount', '')} to goal '{g.get('name')}'. Saved {g.get('saved', 0)} / {g.get('target', 0)}"
-        else:
-            text = result.get("error", "Failed to add to goal.")
-    elif tool == "add_income":
-        if result.get("ok"):
-            tx = result.get("transaction")
-            text = f"Added income of ${tx.get('amount')} on {tx.get('date')}"
-        else:
-            text = f"Failed to add income: {result.get('error') or result.get('message')}"
-    elif tool == "get_budget_status":
-        budgets = result.get("budgets", [])
-        if not budgets:
-            text = "No budgets available."
-        else:
-            parts = [f"{b['name']}: remaining ${b['remaining']:.2f}" for b in budgets]
-            text = "Budget status — " + "; ".join(parts)
-    elif tool == "get_goal_status":
-        goals = result.get("goals", [])
-        if not goals:
-            text = "No goals configured."
-        else:
-            parts = [f"{g['name']}: {g['progress']*100:.0f}% (remaining ${g.get('remaining'):.2f})" for g in goals]
-            text = "Goal progress — " + "; ".join(parts)
-    elif tool == "predict_cashflow":
-        if not result.get("ok"):
-            text = result.get("prediction", "No prediction available.")
-        else:
-            week = result.get("next_week_estimate")
-            month = result.get("next_30_estimate")
-            text = f"Estimated next week spend: ${week:.2f}. Next 30 days: ${month:.2f}."
-    elif tool == "get_total_spent":
-        total_spent = result.get("total_spent", 0.0)
-        expense_count = result.get("expense_count", 0)
-        text = f"You have spent ${total_spent:.2f} in total across {expense_count} expense transactions."
-    elif tool == "check_spending_ability":
-        # Return the spending advice message directly from the tool
-        text = result.get("message", "Unable to determine spending ability.")
-    elif tool == "list_transactions":
-        txs = result.get("transactions", [])
-        if not txs:
-            text = "You have no transactions yet."
-        else:
-            lines = [
-                f"${t['amount']} on {t['category']} ({t['date']})"
-                for t in txs[-5:]
-            ]
-            text = "Here are your recent transactions:\n" + "\n".join(lines)
-    elif tool == "financial_health":
-        summary = result["summary"]
-        budgets = result["budgets"]
-        goals = result["goals"]
+        if user_id:
+            insights = generate_insights(user_id=user_id)
 
-        total_expense = summary['total_expense']
-        avg_daily = total_expense / 30
-
-        text = (
-            f"This month you’ve spent ${total_expense:.2f}. "
-            f"Your average daily spend is ${avg_daily:.2f}.\n"
+        # --------------------------------------------
+        # 4️⃣ RESPONSE COMPOSITION
+        # --------------------------------------------
+        response_text = compose_response(
+            user_input=user_input,
+            intent=intent,
+            entities=entities,
+            tool_result=tool_result,
+            insights=insights,
+            conversation_history=conversation_history
         )
 
-        if budgets:
-            off_track = [b for b in budgets if b["remaining"] < 0]
-            if off_track:
-                text += "⚠️ Some budgets are over limit.\n"
-            else:
-                text += "✅ Your budgets look on track.\n"
+        return {
+            "response": response_text,
+            "intent": intent,
+            "tool": tool_name,
+            "tool_result": tool_result,
+            "context_used": insights
+        }
 
-        if goals:
-            slow = [g for g in goals if g["progress"] < 0.5]
-            if slow:
-                text += "Some goals may need more contributions."
-            else:
-                text += "Your goals are progressing well."
-    elif tool == "none":
-        text = "Sorry, I couldn't determine an action for that request."
-    
-    return {"response": text, "tool": tool, "tool_result": result, "intent": intent_result, "context_used": context_doc_ids}
+    except Exception as e:
+        logger.error(f"Agent execution error: {str(e)}", exc_info=True)
+        return {
+            "response": "I encountered an internal error while processing your request.",
+            "intent": "unknown",
+            "tool": None,
+            "tool_result": None,
+            "context_used": []
+        }
