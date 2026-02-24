@@ -9,7 +9,7 @@ const API_URL = import.meta.env.VITE_API_URL || '';
 const categories = ['Housing', 'Food', 'Transportation', 'Entertainment', 'Utilities', 'Healthcare', 'Savings', 'Miscellaneous', 'Groceries', 'Education' , 'Shopping', 'Dininig'];
 
 const getProgressColor = (percentage) => {
-    if (percentage >= 1) return 'red';
+    if (percentage >= 1) return '#ef4444'; // red for 100% or more
     if (percentage >= 0.8) return 'orange';
     if (percentage >= 0.6) return 'yellow';
     return 'green';
