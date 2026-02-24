@@ -51,7 +51,7 @@ async def chat(req: ChatRequest):
     except Exception as e:
         logger.error(f"Error in chat route: {str(e)}", exc_info=True)
         return ChatResponse(
-            response=f"An error occurred: {str(e)}",
+            response="I ran into an internal error while processing that request.",
             timestamp=datetime.now()
         )
 

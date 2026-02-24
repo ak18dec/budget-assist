@@ -1,17 +1,35 @@
 from typing import List, Dict, Any
-from app.storage import (
-    add_notification,
-    transactions,
-    get_budget_spending,
-    get_goals_due_between,
-    get_balance
-)
+from app.repositories import notifications_repo, budgets_repo, transactions_repo, goals_repo
+
 from datetime import date, timedelta
-from app.agents import eventing
-from app.models import Goal, Transaction
+from app.models import Goal
 import logging
+from typing import Callable, Dict, Any, List
+from threading import Lock
 
 logger = logging.getLogger(__name__)
+
+_handlers: Dict[str, List[Callable[[Dict[str, Any]], Any]]] = {}
+_lock = Lock()
+
+def register(event_name: str, handler: Callable[[Dict[str, Any]], Any]):
+    with _lock:
+        _handlers.setdefault(event_name, []).append(handler)
+        logger.debug(f"Registered handler for event: {event_name}")
+
+
+def emit(event_name: str, payload: Dict[str, Any]):
+    logger.info(f"Event emitted: {event_name}")
+    handlers = _handlers.get(event_name, [])
+    logger.debug(f"Found {len(handlers)} handlers for {event_name}")
+    results = []
+    for h in handlers:
+        try:
+            results.append(h(payload))
+        except Exception as e:
+            logger.error(f"Error in handler for {event_name}: {e}")
+            results.append({"error": str(e)})
+    return results
 
 # ---------------------------
 # Event Handlers
@@ -34,20 +52,27 @@ def on_transaction_created(payload: Dict[str, Any]):
     # 1 Large transaction rule
     if tx.get("amount", 0) > 500:
         logger.warning("⚠️ Large transaction recorded")
-        add_notification(
+        notifications_repo.add_notification(
             notification_type="transaction.large",
             title="Large Transaction",
             message=f"A transaction of {tx['amount']} was added in {tx.get('category', 'Unknown')}"
         )
 
-    # 2 Budget threshold / exceeded rules
+    # 2 Budget threshold / exceeded rules (triggered automatically by SQLite trigger)
     category = tx.get("category")
     if category:
-        spending, limit, alert_threshold = get_budget_spending(category)
+        budget = budgets_repo.get_budget_by_category(category)
+        logger.debug(f"Checking budget for category '{category}': {budget}")
+        if not budget:
+            logger.warning(f"No budget found for category: {category}")
+            return
+        spending = budget.spent_this_month
+        limit = budget.monthly_limit
+        alert_threshold = budget.alert_threshold
         # alert threshold (e.g., 80%)
         if spending >= alert_threshold * limit:
             logger.info(f"Budget threshold reached for {category}")
-            add_notification(
+            notifications_repo.add_notification(
                 notification_type="budget.threshold",
                 title=f"{category} Budget Alert",
                 message=f"Your spending has reached {spending}/{limit} ({spending/limit*100:.0f}%)"
@@ -55,22 +80,14 @@ def on_transaction_created(payload: Dict[str, Any]):
         # exceeded limit
         if spending >= limit:
             logger.warning(f"Budget exceeded for {category}")
-            add_notification(
+            notifications_repo.add_notification(
                 notification_type="budget.exceeded",
                 title=f"{category} Budget Exceeded",
                 message=f"You have exceeded your budget of {limit} for {category}!"
             )
 
     # 4 Balance negative
-    balance = get_balance()
-    if balance < 0:
-        logger.error(f"Negative balance detected: {balance}")
-        add_notification(
-            notification_type="balance.negative",
-            title="Negative Balance",
-            message=f"Your total balance is negative: {balance}"
-        )
-
+    check_negative_balance()
 
 # ---------------------------
 # Goal due date handler
@@ -83,7 +100,7 @@ def on_goal_due_check():
     today = date.today()
     max_days = 5
 
-    upcoming_goals: List[Goal] = get_goals_due_between(
+    upcoming_goals: list[Goal] = goals_repo.get_goals_due_between(
         start=today - timedelta(days=30),  # include overdue
         end=today + timedelta(days=max_days)
     )
@@ -95,7 +112,7 @@ def on_goal_due_check():
 
         message = goal_due_message(goal, locale="IN")
 
-        add_notification(
+        notifications_repo.add_notification(
             notification_type="goal.due_soon",
             title=f"Goal Due Soon: {goal.name}",
             message=message
@@ -135,21 +152,19 @@ def goal_due_message(goal, locale="IN"):
 
 # Rule 4 Expenses exceed income (balance negative)
 def check_negative_balance():
-    income = transactions.total_income()
-    expense = transactions.total_expense()
-
-    if expense > income:
-        add_notification(
-            "balance.negative",
-            "Negative Balance",
-            "Your expenses exceed your income"
+    balance = transactions_repo.get_balance()
+    if balance < 0:
+        logger.error(f"Negative balance detected: {balance}")
+        notifications_repo.add_notification(
+            notification_type="balance.negative",
+            title="Negative Balance",
+            message=f"Your total balance is negative: {balance}"
         )
-
 
 # ---------------------------
 # Register handlers
 # ---------------------------
 def setup_event_handlers():
     logger.info("Registering notification event handlers")
-    eventing.register("transaction.created", on_transaction_created)
-    eventing.register("goal.check_due", on_goal_due_check)
+    register("transaction.created", on_transaction_created)
+    register("goal.check_due", on_goal_due_check)

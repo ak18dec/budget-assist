@@ -1,9 +1,7 @@
 from enum import Enum
 from pydantic import BaseModel, Field, field_validator, computed_field
-from typing import Optional, List
+from typing import Optional
 from datetime import date, datetime
-import uuid
-
 
 class TransactionType(str, Enum):
     EXPENSE = 'EXPENSE'
@@ -74,8 +72,8 @@ class FinancialSummary(BaseModel):
     total_income: float
     total_expense: float
     transactions_count: int
-    budgets: List[Budget]
-    goals: List[Goal]
+    budgets: list[Budget]
+    goals: list[Goal]
 
 
 class ChatRequest(BaseModel):
@@ -87,7 +85,7 @@ class ChatResponse(BaseModel):
     tool: Optional[str] = None
     tool_result: Optional[dict] = None
     intent: Optional[dict] = None
-    context_used: Optional[List[str]] = None
+    context_used: Optional[list[str]] = None
     timestamp: datetime = Field(default_factory=datetime.now)
 
 
