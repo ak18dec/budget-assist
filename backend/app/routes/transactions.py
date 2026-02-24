@@ -1,8 +1,7 @@
-from fastapi import APIRouter, HTTPException
-from typing import List
-from app import storage
-from app import models
-from app.agents import eventing
+from fastapi import APIRouter
+from app.repositories import transactions_repo as storage
+from app.models import Transaction, TransactionBase
+from app.agents import notification_engine as eventing
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,9 +9,10 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.post("/", response_model=models.Transaction)
-def create_transaction(tx: models.TransactionBase):
-    created = storage.add_transaction(tx)
+@router.post("/", response_model=Transaction)
+def create_transaction(tx: TransactionBase):
+    transaction = TransactionBase(**tx.model_dump())  # Validate input and create Transaction instance
+    created = storage.add_transaction(transaction)
 
     payload = {
         "id": created.id,
@@ -31,6 +31,6 @@ def create_transaction(tx: models.TransactionBase):
     return created
 
 
-@router.get("/", response_model=List[models.Transaction])
+@router.get("/", response_model=list[Transaction])
 def get_transactions():
     return storage.list_transactions()

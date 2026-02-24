@@ -91,7 +91,8 @@
   padding: 4px 8px;
   border-radius: 999px;
   background: rgba(255, 0, 0, 0.1);
-  color: #c62828;
+  /* color: #c62828; */
+  color: #ef4444;
   font-weight: 500;
 }
 
@@ -143,7 +144,8 @@
   padding: 8px 10px;
   border-radius: 10px;
   background: rgba(255, 0, 0, 0.08);
-  color: #b71c1c;
+  /* color: #b71c1c; */
+  color: #ef4444;
 }
 
 .budget-warning {
@@ -152,7 +154,8 @@
   border-radius: 10px;
 
   background: rgba(255, 0, 0, 0.08);
-  color: #b71c1c;
+  /* color: #b71c1c; */
+  color: #ef4444;
   font-size: 12px;
 
   opacity: 0;

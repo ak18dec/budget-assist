@@ -1,4 +1,5 @@
-from app import storage, models
+from app import models
+from app.repositories import transactions_repo, budgets_repo, goals_repo, summary_repo
 from datetime import date, datetime, timedelta
 from typing import Dict, Any
 import logging
@@ -26,7 +27,7 @@ def add_transaction_tool(entities: Dict[str, Any]) -> Dict[str, Any]:
 
     logger.info(f"Adding transaction: ${amount} in {category} on {d}")
     tx_base = models.TransactionBase(amount=float(amount), category=category, date=d, type=models.TransactionType.EXPENSE)
-    tx = storage.add_transaction(tx_base)
+    tx = transactions_repo.add_transaction(tx_base)
     return {"ok": True, "transaction": tx.model_dump()}
 
 # --- Income --- #
@@ -39,7 +40,7 @@ def add_income_tool(entities: Dict[str, Any]) -> Dict[str, Any]:
 
     logger.info(f"Adding income: ${amount} on {d}")
     income_base = models.TransactionBase(amount=float(amount), category="income", date=d, type=models.TransactionType.INCOME)
-    tx = storage.add_transaction(income_base)  # reuse storage for simplicity
+    tx = transactions_repo.add_transaction(income_base)  # reuse storage for simplicity
     return {"ok": True, "transaction": tx.model_dump()}
 
 # --- Goal contribution --- #
@@ -54,13 +55,14 @@ def add_goal_contribution_tool(entities: Dict[str, Any]) -> Dict[str, Any]:
         return {"ok": False, "error": "Missing amount"}
 
     # find goal by name (case-insensitive exact match)
-    goal = next((g for g in storage.goals if g.name.lower() == goal_name.lower()), None)
+    goal = next((g for g in goals_repo.list_goals() if g.name.lower() == goal_name.lower()), None)
     if not goal:
         logger.warning(f"Goal '{goal_name}' not found")
         return {"ok": False, "error": f"Goal '{goal_name}' not found"}
 
     # Update goal's saved amount
     goal.saved_amount += float(amount)
+    goals_repo.update_goal(goal)
     logger.info(f"Added ${amount} to goal '{goal_name}'")
 
     return {
@@ -78,11 +80,11 @@ def add_goal_contribution_tool(entities: Dict[str, Any]) -> Dict[str, Any]:
 def get_budget_status_tool(_: Dict[str, Any] = None) -> Dict[str, Any]:
     # Match budgets to categories using exact matching (case-insensitive)
     data = []
-    for b in storage.budgets:
+    for b in budgets_repo.list_budgets():
         # Exact match: normalize budget category to lowercase
         budget_category = (b.category or "").lower() if hasattr(b, 'category') else (b.name or "").lower()
         spent = 0.0
-        for t in storage.transactions:
+        for t in transactions_repo.list_transactions():
             # Normalize transaction category to lowercase for comparison
             tx_category = (t.category or "").lower()
             # Use exact match instead of substring match
@@ -95,7 +97,7 @@ def get_budget_status_tool(_: Dict[str, Any] = None) -> Dict[str, Any]:
 
 def get_goal_status_tool(_: Dict[str, Any] = None) -> Dict[str, Any]:
     data = []
-    for g in storage.goals:
+    for g in goals_repo.list_goals():
         progress = 0.0
         if g.target_amount:
             try:
@@ -123,7 +125,7 @@ def check_spending_ability_tool(entities: Dict[str, Any]) -> Dict[str, Any]:
 
     # Find matching budget
     matching_budget = None
-    for b in storage.budgets:
+    for b in budgets_repo.list_budgets():
         budget_category = (b.category or "").lower() if hasattr(b, 'category') else (b.name or "").lower()
         if budget_category and budget_category == category_lower:
             matching_budget = b
@@ -141,7 +143,7 @@ def check_spending_ability_tool(entities: Dict[str, Any]) -> Dict[str, Any]:
 
     # Calculate current spending for the category
     spent = 0.0
-    for t in storage.transactions:
+    for t in transactions_repo.list_transactions():
         tx_category = (t.category or "").lower()
         if budget_category and budget_category == tx_category:
             spent += t.amount
@@ -172,7 +174,7 @@ def check_spending_ability_tool(entities: Dict[str, Any]) -> Dict[str, Any]:
 
 def predict_cashflow_tool(_: Dict[str, Any] = None) -> Dict[str, Any]:
     # Improved prediction: use recent 30 days (or all) to compute avg daily spend, and project 7/30 days
-    txs = storage.transactions
+    txs = transactions_repo.list_transactions()
     if not txs:
         return {"ok": True, "prediction": "No transactions available to predict."}
 
@@ -202,6 +204,20 @@ def predict_cashflow_tool(_: Dict[str, Any] = None) -> Dict[str, Any]:
     return {"ok": True, "avg_daily": avg_daily, "next_week_estimate": next_week, "next_30_estimate": next_30, "by_category": by_cat}
 
 
+def get_total_spent_tool(_: Dict[str, Any] = None) -> Dict[str, Any]:
+    """Return total historical expense amount and count of expense transactions."""
+    expense_txs = [
+        t for t in transactions_repo.list_transactions()
+        if getattr(t, "type", None) == models.TransactionType.EXPENSE
+    ]
+    total_spent = sum(abs(t.amount) for t in expense_txs)
+    return {
+        "ok": True,
+        "total_spent": total_spent,
+        "expense_count": len(expense_txs),
+    }
+
+
 def list_transactions_tool(_: Dict[str, Any] = None):
     return {
         "ok": True,
@@ -211,12 +227,12 @@ def list_transactions_tool(_: Dict[str, Any] = None):
                 "category": t.category,
                 "date": t.date.isoformat()
             }
-            for t in storage.transactions
+            for t in transactions_repo.list_transactions()
         ]
     }
 
 def financial_health_tool(_: Dict[str, Any] = None):
-    summary = storage.get_financial_summary()
+    summary = summary_repo.get_financial_summary()
     budgets = get_budget_status_tool().get("budgets", [])
     goals = get_goal_status_tool().get("goals", [])
 

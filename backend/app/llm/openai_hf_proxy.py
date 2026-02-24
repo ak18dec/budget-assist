@@ -75,6 +75,7 @@ def _build_structured_prompt(
         "- 'add_goal_contribution': User is saving to a goal (extract: amount, goal_name)\n"
         "- 'ask_budget_status': User wants to know current budget health\n"
         "- 'ask_goal_progress': User wants to know goal progress\n"
+        "- 'ask_total_spent': User asks how much they have already spent in total so far\n"
         "- 'ask_spending_summary': User wants spending predictions/analysis for future planning\n"
         "- 'check_spending_ability': User is asking if they can afford something (extract: amount, category)\n"
         "\n=== CRITICAL: OUTPUT FORMAT ===\n"
@@ -89,6 +90,7 @@ def _build_structured_prompt(
         f"User message: \"{message}\"\n\n"
         "RESPOND WITH ONLY JSON. NO EXPLANATIONS. NO TEXT."
     )
+    return prompt
 
 # --- Generate structured JSON response --- #
 def extract_intent(
@@ -145,13 +147,17 @@ def extract_intent(
                 data = {}
 
         # Ensure keys exist and return as JSON string
+        nested_entities = data.get("entities", {})
+        if not isinstance(nested_entities, dict):
+            nested_entities = {}
+
         result = {
             "intent": data.get("intent", "unknown"),
             "entities": {
-                "amount": data.get("amount"),
-                "category": data.get("category"),
-                "goal_name": data.get("goal_name"),
-                "date": data.get("date")
+                "amount": data.get("amount", nested_entities.get("amount")),
+                "category": data.get("category", nested_entities.get("category")),
+                "goal_name": data.get("goal_name", nested_entities.get("goal_name")),
+                "date": data.get("date", nested_entities.get("date"))
             }
         }
         logger.debug(f"LLM extracted intent: {result['intent']}")

@@ -4,7 +4,6 @@ Stores all user conversations locally in user_data folder for privacy.
 Each day gets its own .md file containing all conversations for that day.
 All conversations within a day share context - the agent has access to the entire day's history.
 """
-import os
 import logging
 from datetime import datetime, date
 from typing import List, Tuple, Optional
@@ -150,7 +149,8 @@ def get_conversation_context(limit: Optional[int] = None) -> str:
     formatted = []
     for turn in recent_turns:
         role_label = "User" if turn.role == "user" else "Assistant"
-        formatted.append(f"{role_label}: {turn.content[:100]}..." if len(turn.content) > 100 else f"{role_label}: {turn.content}")
+        # Keep full turn text so follow-up questions can resolve entities from prior messages.
+        formatted.append(f"{role_label}: {turn.content}")
 
     return "\n".join(formatted)
 

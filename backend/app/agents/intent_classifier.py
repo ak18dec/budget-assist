@@ -1,6 +1,7 @@
 import re
 from dateutil import parser as dateparser
 from typing import Dict, Any, Optional
+from datetime import date, timedelta
 
 COMMON_CATEGORIES = [
     "groceries",
@@ -29,6 +30,47 @@ def _extract_amount(text: str) -> Optional[float]:
 
 
 def _extract_date(text: str) -> Optional[str]:
+    lower = text.lower()
+    if "today" in lower:
+        return date.today().isoformat()
+    if "yesterday" in lower:
+        return (date.today() - timedelta(days=1)).isoformat()
+    if "tomorrow" in lower:
+        return (date.today() + timedelta(days=1)).isoformat()
+
+    has_date_keyword = any(
+        token in lower
+        for token in [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+            "jan",
+            "feb",
+            "mar",
+            "apr",
+            "may",
+            "jun",
+            "jul",
+            "aug",
+            "sep",
+            "oct",
+            "nov",
+            "dec",
+        ]
+    )
+    has_date_pattern = bool(
+        re.search(r"\b\d{4}-\d{1,2}-\d{1,2}\b", text)
+        or re.search(r"\b\d{1,2}/\d{1,2}(?:/\d{2,4})?\b", text)
+        or re.search(r"\b\d{1,2}-\d{1,2}(?:-\d{2,4})?\b", text)
+    )
+    # Avoid parsing plain numbers (e.g., amount "50") as a year/date.
+    if not has_date_keyword and not has_date_pattern:
+        return None
+
     try:
         dt = dateparser.parse(text, fuzzy=True, default=None)
         if dt and dt.year > 2000:
@@ -91,7 +133,19 @@ def classify_intent(message: str) -> Dict[str, Any]:
         intent = "ask_budget_status"
     elif any(w in lower for w in ["goal", "saving"]):
         intent = "ask_goal_progress"
-    elif any(w in lower for w in ["spend", "spent", "summary", "how much", "forecast", "predict"]):
+    elif any(
+        phrase in lower
+        for phrase in [
+            "spent so far",
+            "spent in total",
+            "total spent",
+            "total spending",
+            "what have i spent in total",
+            "how much have i spent",
+        ]
+    ):
+        intent = "ask_total_spent"
+    elif any(w in lower for w in ["spend", "spent", "summary", "forecast", "predict"]):
         intent = "ask_spending_summary"
     # --- Extract common entities --- #
     amt = _extract_amount(message)
