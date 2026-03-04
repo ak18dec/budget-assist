@@ -1,346 +1,106 @@
-/**
- * Global Styles and CSS Variables
- * LinkedIn Design System
- */
-
-/* Import Custom Fonts - SF Pro Display is native, using system fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  /* macOS-inspired colors and tokens */
-  --bg: #F6F6F7;
-  --window: #FFFFFF;
-  --card: #F2F2F7;
-  --sidebar-bg: rgba(245,245,248,0.9);
-  --muted: #6B6B70;
-  --muted-blue: #25538e33;
-  --muted-gray:#646464a6;
-  --primary-text: #1C1C1E;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.15 0.01 250);
 
-  /* Accent (system blue) */
-  --accent-old: #0A84FF;
-  --accent: #5582d6;
-  --accent-strong: #0060DF;
+  --card: oklch(0.98 0.005 250);
+  --card-foreground: oklch(0.15 0.01 250);
 
+  --primary: oklch(0.55 0.15 160); /* fintech green */
+  --primary-foreground: oklch(1 0 0);
 
-  /* Spacing & Borders */
-  --radius: 10px;
-  --radius-sm: 8px;
-  --radius-md: 10px;
+  --secondary: oklch(0.95 0.02 250);
+  --secondary-foreground: oklch(0.2 0.01 250);
 
-  /* Shadows (subtle like macOS) */
-  --shadow: 0 6px 18px rgba(60,60,67,0.08);
-  --shadow-light: 0 2px 6px rgba(60,60,67,0.06);
-  --shadow-medium: 0 10px 30px rgba(60,60,67,0.09);
+  --muted: oklch(0.96 0.01 250);
+  --muted-foreground: oklch(0.5 0.01 250);
 
-  /* Glass / vibrancy */
-  --glass: rgba(255,255,255,0.72);
-  --glass-strong: rgba(250,250,250,0.6);
-
-  /* Status colors */
-  /* --success: #30D158; */
-  --success: #159969;
-  /* --danger: #FF3B30; */
-  /* --danger: #d62929; */
-  --danger: #ef4444;
-  --warning: #FF9F0A;
-
-  /* Borders */
-  --border-light: rgba(60,60,67,0.12);
-  --border-lighter: rgba(60,60,67,0.08);
-
-  --chat-user-bg: rgba(10, 132, 255, 0.14);
-  --chat-user-text: var(--primary-text);
-
-  --chat-bot-bg: rgba(60, 60, 67, 0.06);
-  --chat-bot-text: var(--primary-text);
-
-  /* Typography - SF Pro Display for headings, SF Pro Text for body (system stack)
-     SF fonts are native on macOS; other platforms will fall back to sensible fonts */
-  --font-family-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  --font-family-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --border: oklch(0.9 0.01 250);
+  --radius: 0.5rem;
 }
 
-
-/* ============================= */
-/* Dark Theme — Serendipity Sunset */
-/* ============================= */
-
-:root[data-theme="dark"] {
-  /* Core backgrounds */
-  --bg: #202231;
-  --window: #272938;
-  --card: #272938;
-  --sidebar-bg: #202231;
-
-  /* Text */
-  --primary-text: #DEE0EF;
-  --muted: #6B6D7C;
-
-  /* Accent */
-  --accent: #D6B4B4;
-  --accent-strong: #D1918F;
-
-  /* Status */
-  --success: #709BBD;
-  --danger: #D1918F;
-  --warning: #A392DC;
-
-  /* Borders */
-  --border-light: #6B6D7C26;
-  --border-lighter: #363847;
-
-  /* Shadows (subtle for dark UI) */
-  --shadow: 0 8px 24px rgba(0,0,0,0.35);
-  --shadow-light: 0 4px 12px rgba(0,0,0,0.25);
-  --shadow-medium: 0 12px 36px rgba(0,0,0,0.4);
-
-  /* Glass */
-  --glass: rgba(39,41,56,0.72);
-  --glass-strong: rgba(32,34,49,0.6);
-
-  --chat-user-bg: rgba(10, 132, 255, 0.28);
-  --chat-user-text: #e5e7eb;
-
-  --chat-bot-bg: rgba(255, 255, 255, 0.08);
-  --chat-bot-text: #e5e7eb;
+.dark {
+  --background: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.208 0.042 265.755);
+  --card-foreground: oklch(0.984 0.003 247.858);
+  --popover: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.929 0.013 255.508);
+  --primary-foreground: oklch(0.208 0.042 265.755);
+  --secondary: oklch(0.279 0.041 260.031);
+  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  --accent: oklch(0.279 0.041 260.031);
+  --accent-foreground: oklch(0.984 0.003 247.858);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.551 0.027 264.364);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
-/* ============================= */
-/* Component adjustments (dark) */
-/* ============================= */
-
-:root[data-theme="dark"] body {
-  background: var(--bg);
-  color: var(--primary-text);
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
-:root[data-theme="dark"] .card {
-  background: var(--glass);
-  border: 1px solid var(--border-light);
-  box-shadow: var(--shadow-light);
-}
-
-:root[data-theme="dark"] .button {
-  background: var(--accent);
-  color: #202231;
-}
-
-:root[data-theme="dark"] .button:hover {
-  box-shadow: 0 6px 18px rgba(214,180,180,0.25);
-}
-
-:root[data-theme="dark"] input,
-:root[data-theme="dark"] textarea {
-  background: #202231;
-  color: var(--primary-text);
-  border: 1px solid var(--border-light);
-}
-
-:root[data-theme="dark"] input::placeholder {
-  color: var(--muted);
-}
-
-:root[data-theme="dark"] .chart-tooltip {
-  background: #272938;
-  color: var(--primary-text);
-  border: 1px solid var(--border-light);
-}
-
-:root[data-theme="dark"] .muted {
-  color: var(--muted);
-}
-
-
-
-
-
-
-
-
-/* Reset and Base Styles */
-html,
-body,
-#root {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  padding: 20px;
-  font-family: var(--font-family-body);
-  background: var(--bg);
-  color: var(--primary-text);
-  -webkit-font-smoothing:antialiased;
-}
-
-/* Typography - Headings use SF Pro Display */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-family-display);
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-
-h1 {
-  font-size: 32px;
-}
-
-h2 {
-  font-size: 28px;
-}
-
-h3 {
-  font-size: 24px;
-}
-
-h4 {
-  font-size: 20px;
-}
-
-h5 {
-  font-size: 18px;
-}
-
-h6 {
-  font-size: 16px;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-/* Layout */
-.app-container {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1.6fr 1fr;
-  gap: 20px;
-  align-items: start;
-}
-
-/* Card Base Styles */
-.card {
-  background: var(--glass);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-light);
-  padding: 14px;
-  border: 1px solid var(--border-lighter);
-  backdrop-filter: blur(6px);
-}
-
-/* Utility Classes */
-.muted {
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.card h3 {
-  margin: 0 0 8px 0;
-  font-size: 16px;
-}
-
-/* Button Base Styles */
-.button {
-  background: var(--accent);
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: transform 0.08s ease, box-shadow 0.12s ease;
-}
-
-.button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(10,132,255,0.12);
-}
-
-.button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.button:focus-visible {
-  box-shadow: 0 0 0 4px rgba(10,132,255,0.12);
-  outline: none;
-}
-
-.button.add {
-  display: flex;
-  align-items: center;
-  /* gap: 6px; */
-  padding: 8px 12px;
-}
-
-/* Form Elements */
-.form-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.form-row input[type='text'],
-.form-row input[type='date'],
-.form-row input[type='number'],
-textarea {
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid var(--border-light);
-  background: var(--window);
-  font-family: var(--font-family);
-}
-
-input::placeholder {
-  color: var(--muted);
-}
-
-/* Delta indicators */
-.delta-up {
-  color: var(--success);
-  font-weight: 700;
-}
-
-.delta-down {
-  color: var(--danger);
-  font-weight: 700;
-}
-
-/* Tooltip */
-.chart-tooltip {
-  background: var(--window);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-medium);
-  border: 1px solid var(--border-lighter);
-}
-
-/* macOS-specific helpers */
-.glass { backdrop-filter: blur(6px); background: var(--glass); border-radius: var(--radius); }
-
-/* Sidebar collapsed helpers */
-/* .sidebar.collapsed .nav-label { display: none; }
-.sidebar.collapsed .brand { display: none; }
-.sidebar.collapsed .sidebar-footer { display: none; } */
-
-/* Focus Styles for Accessibility */
-.icon-btn:focus-visible,
-.button:focus-visible {
-  outline: 3px solid rgba(59, 130, 246, 0.22);
-  outline-offset: 2px;
-}
-
-/* Responsive Design */
-@media (max-width: 900px) {
-  .app-container {
-    grid-template-columns: 1fr;
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
   }
 }

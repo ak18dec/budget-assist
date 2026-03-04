@@ -1,7 +1,8 @@
 import {useEffect, useState, useRef} from 'react'
 import { FiSearch, FiBell, FiDownload, FiSun, FiMoon } from 'react-icons/fi'
 import { timeAgo } from '../utils/Formatters.js'
-import './Topbar.css'
+// import './Topbar.css'
+import { Button } from "@/components/ui/button"
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -158,30 +159,35 @@ function NotificationBell(){
   )
 }
 
+// export default function Topbar(){
+//   return (
+//     <div className="topbar">
+//       <div className="topbar-left">
+//         <div>
+//           <h1 style={{margin:0, marginBottom:5}}>Good Morning, Harry</h1>
+//           <Button>Button</Button>
+//           <div className="muted" style={{fontSize:14}}>Welcome to your financial insights.</div>
+//         </div>
+//       </div>
+
+//       <div className="topbar-right">
+//         <button className="icon-btn" aria-label="Search">
+//           <FiSearch size={18} />
+//         </button>
+
+//         <NotificationBell />
+
+//         <ThemeToggle />
+
+//         <button className="button export" onClick={exportTransactions} aria-label="Export transactions">
+//           <FiDownload size={14} style={{marginRight:8}} />
+//           Export
+//         </button>
+//       </div>
+//     </div>
+//   )
+// }
+
 export default function Topbar(){
-  return (
-    <div className="topbar">
-      <div className="topbar-left">
-        <div>
-          <h1 style={{margin:0, marginBottom:5}}>Good Morning, Harry</h1>
-          <div className="muted" style={{fontSize:14}}>Welcome to your financial insights.</div>
-        </div>
-      </div>
-
-      <div className="topbar-right">
-        <button className="icon-btn" aria-label="Search">
-          <FiSearch size={18} />
-        </button>
-
-        <NotificationBell />
-
-        <ThemeToggle />
-
-        <button className="button export" onClick={exportTransactions} aria-label="Export transactions">
-          <FiDownload size={14} style={{marginRight:8}} />
-          Export
-        </button>
-      </div>
-    </div>
-  )
+  return (<div>Topbar</div>)
 }
