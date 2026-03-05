@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
-import SummaryCards from '../components/SummaryCards'
-import FinancialChart from '../components/FinancialChart'
-import RecentTransactions from '../components/RecentTransactions'
-import SavingsList from '../components/SavingsList'
+import SummaryCards from '../../components/SummaryCards'
+import FinancialChart from '../../components/FinancialChart'
+import RecentTransactions from '../../components/RecentTransactions'
+import SavingsList from '../../components/SavingsList'
 import { FiInfo } from 'react-icons/fi'
-import { rangeToQuery } from '../utils/Formatters.js'
+import { rangeToQuery } from '../../utils/Formatters.js'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 

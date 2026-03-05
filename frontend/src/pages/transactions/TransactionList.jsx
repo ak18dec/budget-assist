@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react'
 import axios from 'axios'
-import TransactionForm from './TransactionForm.jsx'
-import { fmtDateTime, fmtCurrency, capitalize } from '../utils/Formatters.js'
+import TransactionForm from '@/pages/transactions/TransactionForm.jsx'
+import { fmtDateTime, fmtCurrency, capitalize } from '../../utils/Formatters.js'
 import { FiChevronUp, FiChevronDown } from 'react-icons/fi'
 import './TransactionList.css'
 

@@ -1,9 +1,9 @@
 import { Routes, Route } from 'react-router-dom'
 import AppLayout from './components/AppLayout'
-import Dashboard from './components/Dashboard'
-import TransactionList from './components/TransactionList'
-import BudgetList from './components/BudgetList'
-import GoalsList from './components/GoalsList'
+import Dashboard from './pages/dashboard/Dashboard'
+import TransactionList from './pages/transactions/TransactionList'
+import BudgetList from './pages/budgets/BudgetList'
+import GoalsList from './pages/goals/GoalsList'
 import './App.css'
 
 export default function App() {

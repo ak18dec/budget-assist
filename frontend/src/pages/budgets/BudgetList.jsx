@@ -2,7 +2,7 @@ import {useEffect, useState, useRef} from 'react'
 import axios from 'axios'
 import { FiPlus, FiChevronUp, FiChevronDown } from 'react-icons/fi'
 import './BudgetList.css'
-import { fmtCurrency } from '../utils/Formatters.js'
+import { fmtCurrency } from '../../utils/Formatters.js'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 

@@ -3,6 +3,7 @@ import { FiSearch, FiBell, FiDownload, FiSun, FiMoon } from 'react-icons/fi'
 import { timeAgo } from '../utils/Formatters.js'
 // import './Topbar.css'
 import { Button } from "@/components/ui/button"
+import { Download, Sun, Moon } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -56,13 +57,16 @@ function ThemeToggle() {
   };
 
   return (
-    <button
-      className="button export"
-      onClick={toggleTheme}
-      aria-label="Toggle theme"
-    >
-      {theme === "dark" ? <FiSun size={14} /> : <FiMoon size={14} />}
-    </button>
+    // <button
+    //   className="button export"
+    //   onClick={toggleTheme}
+    //   aria-label="Toggle theme"
+    // >
+    //   {theme === "dark" ? <FiSun size={14} /> : <FiMoon size={14} />}
+    // </button>
+    <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" className="cursor-pointer">
+      {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
+    </Button>
   );
 }
 
@@ -189,5 +193,16 @@ function NotificationBell(){
 // }
 
 export default function Topbar(){
-  return (<div>Topbar</div>)
+  return (
+    <>
+    <h1 className="text-base font-medium">Documents</h1>
+    <div className="ml-auto flex items-center gap-2">
+      <NotificationBell />
+      <ThemeToggle />
+      <Button variant="ghost" size="sm" className="hidden sm:flex cursor-pointer" onClick={exportTransactions} >
+        <Download />Export
+      </Button>
+    </div>
+    </>
+  )
 }

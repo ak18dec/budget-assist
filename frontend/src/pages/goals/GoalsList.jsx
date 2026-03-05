@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react'
 import axios from 'axios'
 import { FiPlus, FiEdit, FiX, FiCheck } from 'react-icons/fi'
-import { fmtDate, fmtCurrency } from '../utils/Formatters.js'
+import { fmtDate, fmtCurrency } from '../../utils/Formatters.js'
 import './GoalsList.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
