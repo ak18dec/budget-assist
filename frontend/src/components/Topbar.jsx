@@ -1,10 +1,16 @@
 import {useEffect, useState, useRef} from 'react'
-import { FiSearch, FiBell, FiDownload, FiSun, FiMoon } from 'react-icons/fi'
+import { useLocation, Link } from "react-router-dom"
 import { timeAgo } from '../utils/Formatters.js'
-// import './Topbar.css'
 import { Button } from "@/components/ui/button"
 import { Download, Sun, Moon, Bell } from 'lucide-react';
 import { useTheme } from "next-themes"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -179,11 +185,45 @@ function NotificationBell(){
 // }
 
 export default function Topbar(){
+
+  const location = useLocation()
+  const path = location.pathname
+  const isDashboard = path === "/" || path === "/dashboard"
+
+  const routeTitles = {
+    transactions: "Transactions",
+    budgets: "Budgets",
+    goals: "Goals",
+  }
+
+  const segment = path.split("/")[1]
+  const pageTitle = routeTitles[segment]
+
+
   return (
     <>
-    <div>
-      <h1 className="text-base font-medium text-sm">Good Morning, Harry</h1>
-      <span className="text-xs">Welcome to your financial insights.</span>
+    <div id="title-header">
+      {isDashboard ? (
+        <>
+          <h1 className="text-base font-medium text-sm">Good Morning, Harry</h1>
+          <span className="text-xs">Welcome to your financial insights.</span>
+        </>
+        ) : (
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{pageTitle}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb> 
+        )}
+              
     </div>
     <div className="ml-auto flex items-center gap-2">
       <NotificationBell />
