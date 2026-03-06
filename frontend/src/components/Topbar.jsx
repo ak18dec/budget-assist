@@ -3,7 +3,8 @@ import { FiSearch, FiBell, FiDownload, FiSun, FiMoon } from 'react-icons/fi'
 import { timeAgo } from '../utils/Formatters.js'
 // import './Topbar.css'
 import { Button } from "@/components/ui/button"
-import { Download, Sun, Moon } from 'lucide-react';
+import { Download, Sun, Moon, Bell } from 'lucide-react';
+import { useTheme } from "next-themes"
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -46,15 +47,7 @@ function exportTransactions(){
 }
 
 function ThemeToggle() {
-  const [theme, setTheme] = useState(
-    document.documentElement.dataset.theme || "light"
-  );
-
-  const toggleTheme = () => {
-    const next = theme === "dark" ? "light" : "dark";
-    document.documentElement.dataset.theme = next;
-    setTheme(next);
-  };
+  const { theme, setTheme } = useTheme()
 
   return (
     // <button
@@ -64,7 +57,7 @@ function ThemeToggle() {
     // >
     //   {theme === "dark" ? <FiSun size={14} /> : <FiMoon size={14} />}
     // </button>
-    <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" className="cursor-pointer">
+    <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Toggle theme" className="cursor-pointer">
       {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
     </Button>
   );
@@ -130,10 +123,10 @@ function NotificationBell(){
 
   return (
     <div style={{position:'relative'}}>
-      <button ref={btnRef} className="icon-btn notif" aria-haspopup="menu" aria-expanded={open} onClick={toggle} onKeyDown={(e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); toggle() } }}>
-        <FiBell size={18} />
+      <Button ref={btnRef} variant="ghost" size="icon" className="cursor-pointer" aria-haspopup="menu" aria-expanded={open} onClick={toggle} onKeyDown={(e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); toggle() } }}>
+        <Bell size={14} />
         {unreadCount > 0 && <span className="notif-dot" />}
-      </button>
+      </Button>
 
       {open && (
         <div ref={menuRef} className="notif-dropdown card" role="menu" aria-label="Notifications list" style={{position:'absolute', right:0, top:40, width:300, zIndex:30}}>
