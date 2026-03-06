@@ -50,13 +50,6 @@ function ThemeToggle() {
   const { theme, setTheme } = useTheme()
 
   return (
-    // <button
-    //   className="button export"
-    //   onClick={toggleTheme}
-    //   aria-label="Toggle theme"
-    // >
-    //   {theme === "dark" ? <FiSun size={14} /> : <FiMoon size={14} />}
-    // </button>
     <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Toggle theme" className="cursor-pointer">
       {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
     </Button>
@@ -188,7 +181,10 @@ function NotificationBell(){
 export default function Topbar(){
   return (
     <>
-    <h1 className="text-base font-medium">Documents</h1>
+    <div>
+      <h1 className="text-base font-medium text-sm">Good Morning, Harry</h1>
+      <span className="text-xs">Welcome to your financial insights.</span>
+    </div>
     <div className="ml-auto flex items-center gap-2">
       <NotificationBell />
       <ThemeToggle />
