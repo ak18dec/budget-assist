@@ -1,142 +1,442 @@
-import {useState, useRef, useEffect} from 'react'
-import axios from 'axios'
-import { FiChevronUp, FiChevronDown } from 'react-icons/fi'
-import './TransactionForm.css'
+// import {useState, useRef, useEffect} from 'react'
+// import axios from 'axios'
+// import { FiChevronUp, FiChevronDown } from 'react-icons/fi'
+// import './TransactionForm.css'
 
-const API_URL = import.meta.env.VITE_API_URL || '';
+// const API_URL = import.meta.env.VITE_API_URL || '';
 
-function TypeDropdown({ value, onChange }) {
-  const [open, setOpen] = useState(false)
-  const [highlighted, setHighlighted] = useState(-1)
-  const ref = useRef(null)
+// function TypeDropdown({ value, onChange }) {
+//   const [open, setOpen] = useState(false)
+//   const [highlighted, setHighlighted] = useState(-1)
+//   const ref = useRef(null)
 
-  const OPTIONS = [
-    { label: 'Expense', value: 'EXPENSE' },
-    { label: 'Income', value: 'INCOME' },
-  ]
+//   const OPTIONS = [
+//     { label: 'Expense', value: 'EXPENSE' },
+//     { label: 'Income', value: 'INCOME' },
+//   ]
 
-  const selected = OPTIONS.find(o => o.value === value)
+//   const selected = OPTIONS.find(o => o.value === value)
 
-  // Close on outside click
-  useEffect(() => {
-    function onClickOutside(e) {
-      if (ref.current && !ref.current.contains(e.target)) {
-        setOpen(false)
-        setHighlighted(-1)
-      }
-    }
-    document.addEventListener('mousedown', onClickOutside)
-    return () => document.removeEventListener('mousedown', onClickOutside)
-  }, [])
+//   // Close on outside click
+//   useEffect(() => {
+//     function onClickOutside(e) {
+//       if (ref.current && !ref.current.contains(e.target)) {
+//         setOpen(false)
+//         setHighlighted(-1)
+//       }
+//     }
+//     document.addEventListener('mousedown', onClickOutside)
+//     return () => document.removeEventListener('mousedown', onClickOutside)
+//   }, [])
 
-  // Keyboard navigation
-  function onKeyDown(e) {
-    if (!open) {
-      if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault()
-        setOpen(true)
-        setHighlighted(0)
-      }
-      return
-    }
+//   // Keyboard navigation
+//   function onKeyDown(e) {
+//     if (!open) {
+//       if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+//         e.preventDefault()
+//         setOpen(true)
+//         setHighlighted(0)
+//       }
+//       return
+//     }
 
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setHighlighted(prev => (prev + 1) % OPTIONS.length)
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      setHighlighted(prev => (prev - 1 + OPTIONS.length) % OPTIONS.length)
-    } else if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      if (highlighted >= 0) {
-        onChange(OPTIONS[highlighted].value)
-        setOpen(false)
-        setHighlighted(-1)
-      }
-    } else if (e.key === 'Escape') {
-      e.preventDefault()
-      setOpen(false)
-      setHighlighted(-1)
-    }
-  }
+//     if (e.key === 'ArrowDown') {
+//       e.preventDefault()
+//       setHighlighted(prev => (prev + 1) % OPTIONS.length)
+//     } else if (e.key === 'ArrowUp') {
+//       e.preventDefault()
+//       setHighlighted(prev => (prev - 1 + OPTIONS.length) % OPTIONS.length)
+//     } else if (e.key === 'Enter' || e.key === ' ') {
+//       e.preventDefault()
+//       if (highlighted >= 0) {
+//         onChange(OPTIONS[highlighted].value)
+//         setOpen(false)
+//         setHighlighted(-1)
+//       }
+//     } else if (e.key === 'Escape') {
+//       e.preventDefault()
+//       setOpen(false)
+//       setHighlighted(-1)
+//     }
+//   }
 
-  return (
-    <div className="t-range-dropdown t-type-dropdown" ref={ref} tabIndex={0} onKeyDown={onKeyDown}>
-      <button
-        type="button"
-        className="t-range-trigger"
-        onClick={() => setOpen(o => !o)}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-      >
-        <span>{selected?.label}</span>
-        {open ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
-      </button>
+//   return (
+//     <div className="t-range-dropdown t-type-dropdown" ref={ref} tabIndex={0} onKeyDown={onKeyDown}>
+//       <button
+//         type="button"
+//         className="t-range-trigger"
+//         onClick={() => setOpen(o => !o)}
+//         aria-haspopup="listbox"
+//         aria-expanded={open}
+//       >
+//         <span>{selected?.label}</span>
+//         {open ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+//       </button>
 
-      {open && (
-        <div className="t-range-menu" role="listbox">
-          {OPTIONS.map((opt, idx) => (
-            <button
-              key={opt.value}
-              className={`t-range-item ${opt.value === value ? 'active' : ''} ${
-                idx === highlighted ? 'highlighted' : ''
-              }`}
-              onClick={() => {
-                onChange(opt.value)
-                setOpen(false)
-                setHighlighted(-1)
-              }}
-              role="option"
-              aria-selected={opt.value === value}
-              onMouseEnter={() => setHighlighted(idx)}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
+//       {open && (
+//         <div className="t-range-menu" role="listbox">
+//           {OPTIONS.map((opt, idx) => (
+//             <button
+//               key={opt.value}
+//               className={`t-range-item ${opt.value === value ? 'active' : ''} ${
+//                 idx === highlighted ? 'highlighted' : ''
+//               }`}
+//               onClick={() => {
+//                 onChange(opt.value)
+//                 setOpen(false)
+//                 setHighlighted(-1)
+//               }}
+//               role="option"
+//               aria-selected={opt.value === value}
+//               onMouseEnter={() => setHighlighted(idx)}
+//             >
+//               {opt.label}
+//             </button>
+//           ))}
+//         </div>
+//       )}
+//     </div>
+//   )
+// }
 
 
-export default function TransactionForm(){
-  const [type, setType] = useState('EXPENSE')
-  const [amount, setAmount] = useState('')
-  const [category, setCategory] = useState('')
-  const [description, setDescription] = useState('')
-  const [date, setDate] = useState('')
+// export default function TransactionForm(){
+//   const [type, setType] = useState('EXPENSE')
+//   const [amount, setAmount] = useState('')
+//   const [category, setCategory] = useState('')
+//   const [description, setDescription] = useState('')
+//   const [date, setDate] = useState('')
 
-  async function submit(e){
+//   async function submit(e){
+//     e.preventDefault()
+//     try{
+//       await axios.post(`${API_URL}/transactions/`, 
+//         { 
+//           amount: parseFloat(amount), 
+//           category, 
+//           description, 
+//           date, 
+//           type
+//         })
+//       setType('EXPENSE'); setAmount(''); setCategory(''); setDescription(''); setDate('')
+//       window.dispatchEvent(new Event('transactions:changed'))
+//     }catch(err){
+//       console.error(err)
+//       alert('Failed to add transaction')
+//     }
+//   }
+
+//   return (
+//       <form onSubmit={submit} className='card' style={{zIndex: 1000}}>
+//         <h1 className='muted'>Add Transaction</h1>
+//         <div className="form-row">
+//           <TypeDropdown value={type} onChange={setType} />
+//           <input className='form-input' type="number" step="0.01" placeholder="Amount" value={amount} onChange={e=>setAmount(e.target.value)} />
+//           <input className='form-input' placeholder="Category" value={category} onChange={e=>setCategory(e.target.value)} />
+//           <input className='form-input' placeholder="Description" value={description} onChange={e=>setDescription(e.target.value)} />
+//           <input className='form-input' type="date" value={date} onChange={e=>setDate(e.target.value)} />
+//           <button className="button" type="submit">Add</button>
+//         </div>
+//       </form>
+//   );
+// }
+
+// import { useState } from "react"
+// import axios from "axios"
+
+// import { Button } from "@/components/ui/button"
+// import { Input } from "@/components/ui/input"
+// import {
+//   Card,
+//   CardHeader,
+//   CardTitle,
+//   CardContent
+// } from "@/components/ui/card"
+
+// import {
+//   Select,
+//   SelectTrigger,
+//   SelectValue,
+//   SelectContent,
+//   SelectItem
+// } from "@/components/ui/select"
+
+// const API_URL = import.meta.env.VITE_API_URL || ""
+
+// export default function TransactionForm() {
+
+//   const [type, setType] = useState("EXPENSE")
+//   const [amount, setAmount] = useState("")
+//   const [category, setCategory] = useState("")
+//   const [description, setDescription] = useState("")
+//   const [date, setDate] = useState("")
+
+//   async function submit(e) {
+//     e.preventDefault()
+
+//     try {
+//       await axios.post(`${API_URL}/transactions/`, {
+//         amount: parseFloat(amount),
+//         category,
+//         description,
+//         date,
+//         type
+//       })
+
+//       setType("EXPENSE")
+//       setAmount("")
+//       setCategory("")
+//       setDescription("")
+//       setDate("")
+
+//       window.dispatchEvent(new Event("transactions:changed"))
+
+//     } catch (err) {
+//       console.error(err)
+//       alert("Failed to add transaction")
+//     }
+//   }
+
+//   return (
+
+//     <Card className="mb-6">
+
+//       <CardHeader>
+//         <CardTitle>Add Transaction</CardTitle>
+//       </CardHeader>
+
+//       <CardContent>
+
+//         <form
+//           onSubmit={submit}
+//           className="flex flex-wrap gap-3 items-end"
+//         >
+
+//           <div className="w-[140px]">
+//             <Select value={type} onValueChange={setType}>
+//               <SelectTrigger>
+//                 <SelectValue />
+//               </SelectTrigger>
+
+//               <SelectContent>
+//                 <SelectItem value="EXPENSE">Expense</SelectItem>
+//                 <SelectItem value="INCOME">Income</SelectItem>
+//               </SelectContent>
+//             </Select>
+//           </div>
+
+//           <Input
+//             type="number"
+//             step="0.01"
+//             placeholder="Amount"
+//             value={amount}
+//             onChange={e => setAmount(e.target.value)}
+//             className="w-[140px]"
+//             required
+//           />
+
+//           <Input
+//             placeholder="Category"
+//             value={category}
+//             onChange={e => setCategory(e.target.value)}
+//             className="w-[160px]"
+//             required
+//           />
+
+//           <Input
+//             placeholder="Description"
+//             value={description}
+//             onChange={e => setDescription(e.target.value)}
+//             className="w-[200px]"
+//           />
+
+//           <Input
+//             type="date"
+//             value={date}
+//             onChange={e => setDate(e.target.value)}
+//             className="w-[160px]"
+//             required
+//           />
+
+//           <Button type="submit">
+//             Add
+//           </Button>
+
+//         </form>
+
+//       </CardContent>
+
+//     </Card>
+
+//   )
+// }
+
+
+import { useState } from "react"
+import axios from "axios"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent
+} from "@/components/ui/card"
+
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
+} from "@/components/ui/select"
+
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent
+} from "@/components/ui/popover"
+
+import { Calendar } from "@/components/ui/calendar"
+import { cn } from "@/lib/utils"
+
+const API_URL = import.meta.env.VITE_API_URL || ""
+
+export default function TransactionForm() {
+
+  const [type, setType] = useState("EXPENSE")
+  const [amount, setAmount] = useState("")
+  const [category, setCategory] = useState("")
+  const [description, setDescription] = useState("")
+  const [date, setDate] = useState(new Date())
+
+  async function submit(e) {
     e.preventDefault()
-    try{
-      await axios.post(`${API_URL}/transactions/`, 
-        { 
-          amount: parseFloat(amount), 
-          category, 
-          description, 
-          date, 
-          type
-        })
-      setType('EXPENSE'); setAmount(''); setCategory(''); setDescription(''); setDate('')
-      window.dispatchEvent(new Event('transactions:changed'))
-    }catch(err){
+
+    try {
+      await axios.post(`${API_URL}/transactions/`, {
+        amount: parseFloat(amount),
+        category,
+        description,
+        date: date ? format(date, "yyyy-MM-dd") : null,
+        type
+      })
+
+      setType("EXPENSE")
+      setAmount("")
+      setCategory("")
+      setDescription("")
+      setDate(new Date())
+
+      window.dispatchEvent(new Event("transactions:changed"))
+
+    } catch (err) {
       console.error(err)
-      alert('Failed to add transaction')
+      alert("Failed to add transaction")
     }
   }
 
   return (
-      <form onSubmit={submit} className='card' style={{zIndex: 1000}}>
-        <h1 className='muted'>Add Transaction</h1>
-        <div className="form-row">
-          <TypeDropdown value={type} onChange={setType} />
-          <input className='form-input' type="number" step="0.01" placeholder="Amount" value={amount} onChange={e=>setAmount(e.target.value)} />
-          <input className='form-input' placeholder="Category" value={category} onChange={e=>setCategory(e.target.value)} />
-          <input className='form-input' placeholder="Description" value={description} onChange={e=>setDescription(e.target.value)} />
-          <input className='form-input' type="date" value={date} onChange={e=>setDate(e.target.value)} />
-          <button className="button" type="submit">Add</button>
-        </div>
-      </form>
-  );
+
+    <Card className="mb-6">
+
+      <CardHeader>
+        <CardTitle>Add Transaction</CardTitle>
+      </CardHeader>
+
+      <CardContent>
+
+        <form
+          onSubmit={submit}
+          className="flex flex-wrap gap-3 items-end"
+        >
+
+          {/* Type */}
+          <div className="w-[140px]">
+            <Select value={type} onValueChange={setType}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="EXPENSE">Expense</SelectItem>
+                <SelectItem value="INCOME">Income</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Amount */}
+          <Input
+            type="number"
+            step="0.01"
+            placeholder="Amount"
+            value={amount}
+            onChange={e => setAmount(e.target.value)}
+            className="w-[140px]"
+            required
+          />
+
+          {/* Category */}
+          <Input
+            placeholder="Category"
+            value={category}
+            onChange={e => setCategory(e.target.value)}
+            className="w-[160px]"
+            required
+          />
+
+          {/* Description */}
+          <Input
+            placeholder="Description"
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            className="w-[200px]"
+          />
+
+          {/* Date Picker */}
+          <Popover>
+            <PopoverTrigger asChild>
+
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-[180px] justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+
+                {date ? format(date, "PPP") : "Pick a date"}
+
+              </Button>
+
+            </PopoverTrigger>
+
+            <PopoverContent className="w-auto p-0">
+
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+              />
+
+            </PopoverContent>
+          </Popover>
+
+          {/* Submit */}
+          <Button type="submit">
+            Add
+          </Button>
+
+        </form>
+
+      </CardContent>
+
+    </Card>
+
+  )
 }
