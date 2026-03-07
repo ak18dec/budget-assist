@@ -153,8 +153,17 @@ import {
   TableCell
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
 
 import { FiChevronUp, FiChevronDown } from "react-icons/fi"
+import { BrushCleaning } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || ""
 
@@ -166,10 +175,8 @@ function SortIcon({ active, dir }) {
 }
 
 export default function TransactionList() {
-
   const [items, setItems] = useState([])
   const [filter, setFilter] = useState("ALL")
-
   const [sort, setSort] = useState({
     key: "date",
     dir: "desc"
@@ -194,19 +201,14 @@ export default function TransactionList() {
     return () => window.removeEventListener("transactions:changed", load)
   }, [])
 
-  const visibleItems =
-    filter === "ALL" ? items : items.filter(tx => tx.type === filter)
-
+  const visibleItems = filter === "ALL" ? items : items.filter(tx => tx.type === filter)
   const sortedItems = [...visibleItems].sort((a, b) => {
-
     let diff = 0
-
     if (sort.key === "amount") {
       diff = Math.abs(a.amount) - Math.abs(b.amount)
     } else {
       diff = new Date(a.date) - new Date(b.date)
     }
-
     return sort.dir === "asc" ? diff : -diff
   })
 
@@ -218,138 +220,107 @@ export default function TransactionList() {
   }
 
   return (
-    <div className="space-y-6">
-
+    <div className="space-y-6 p-3">
+      <TransactionForm />
       <Card>
-        <CardHeader>
-          <CardTitle>Transactions</CardTitle>
-        </CardHeader>
-
         <CardContent>
-
-          <TransactionForm />
-
-          {/* Filters */}
-          <div className="flex gap-2 mb-4 mt-4">
-
-            {["ALL", "INCOME", "EXPENSE"].map(t => (
-
-              <Button
-                key={t}
-                size="sm"
-                variant={filter === t ? "default" : "outline"}
-                onClick={() => setFilter(t)}
-              >
-                {capitalize(t)}
-              </Button>
-
-            ))}
-
-          </div>
-
           {items.length === 0 && (
-            <div className="text-sm text-muted-foreground">
-              No transactions yet
-            </div>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <BrushCleaning />
+                </EmptyMedia>
+                <EmptyTitle>No Transactions Yet</EmptyTitle>
+                <EmptyDescription className="max-w-xs text-pretty">
+                  You haven&apos;t added any transactions yet. Get started by adding
+                  your first transaction.
+                </EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent className="flex-row justify-center gap-2">
+                
+              </EmptyContent>
+            </Empty>
           )}
-
           {items.length > 0 && (
-
-            <Table>
-
-              <TableHeader>
-
-                <TableRow>
-
-                  <TableHead>Category</TableHead>
-
-                  <TableHead
-                    className="cursor-pointer"
-                    onClick={() => toggleSort("date")}
+            <>
+              <div className="flex gap-2 mb-4 mt-4">
+                {["ALL", "INCOME", "EXPENSE"].map(t => (
+                  <Button
+                    key={t}
+                    size="sm"
+                    variant={filter === t ? "default" : "outline"}
+                    onClick={() => setFilter(t)}
                   >
-                    <div className="flex items-center">
-                      Date
-                      <SortIcon
-                        active={sort.key === "date"}
-                        dir={sort.dir}
-                      />
-                    </div>
-                  </TableHead>
-
-                  <TableHead
-                    className="text-right cursor-pointer"
-                    onClick={() => toggleSort("amount")}
-                  >
-                    <div className="flex items-center justify-end">
-                      Amount
-                      <SortIcon
-                        active={sort.key === "amount"}
-                        dir={sort.dir}
-                      />
-                    </div>
-                  </TableHead>
-
-                </TableRow>
-
-              </TableHeader>
-
-              <TableBody>
-
-                {sortedItems.map(tx => (
-
-                  <TableRow key={tx.id}>
-
-                    <TableCell>
-
-                      <div className="flex items-center gap-3">
-
-                        <div className="h-8 w-8 flex items-center justify-center rounded-full bg-muted text-xs font-medium">
-                          {(capitalize(tx.category) || "?").slice(0, 1)}
-                        </div>
-
-                        <div>
-
-                          <div className="font-medium">
-                            {capitalize(tx.category)}
-                          </div>
-
-                          <div className="text-xs text-muted-foreground">
-                            {tx.description || ""}
-                          </div>
-
-                        </div>
-
-                      </div>
-
-                    </TableCell>
-
-                    <TableCell className="text-muted-foreground">
-                      {fmtDateTime(tx.date)}
-                    </TableCell>
-
-                    <TableCell className="text-right">
-
-                      <Badge
-                        variant={tx.type === "EXPENSE" ? "destructive" : "secondary"}
-                      >
-                        {fmtCurrency(tx.amount)}
-                      </Badge>
-
-                    </TableCell>
-
-                  </TableRow>
-
+                    {capitalize(t)}
+                  </Button>
                 ))}
-
-              </TableBody>
-
-            </Table>
-
+              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Category</TableHead>
+                    <TableHead
+                      className="cursor-pointer"
+                      onClick={() => toggleSort("date")}
+                    >
+                      <div className="flex items-center">
+                        Date
+                        <SortIcon
+                          active={sort.key === "date"}
+                          dir={sort.dir}
+                        />
+                      </div>
+                    </TableHead>
+                    <TableHead
+                      className="text-right cursor-pointer"
+                      onClick={() => toggleSort("amount")}
+                    >
+                      <div className="flex items-center justify-end">
+                        Amount
+                        <SortIcon
+                          active={sort.key === "amount"}
+                          dir={sort.dir}
+                        />
+                      </div>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sortedItems.map(tx => (
+                    <TableRow key={tx.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="h-8 w-8 flex items-center justify-center rounded-full bg-muted text-xs font-medium">
+                            {(capitalize(tx.category) || "?").slice(0, 1)}
+                          </div>
+                          <div>
+                            <div className="font-medium">
+                              {capitalize(tx.category)}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {tx.description || ""}
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {fmtDateTime(tx.date)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Badge
+                          variant={tx.type === "EXPENSE" ? "destructive" : "secondary"}
+                        >
+                          {fmtCurrency(tx.amount)}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </>
           )}
-
         </CardContent>
       </Card>
-
     </div>
   )
 }
