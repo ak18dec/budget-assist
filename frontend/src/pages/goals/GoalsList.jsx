@@ -441,7 +441,7 @@ function GoalItem({ goal, onUpdate }) {
                     data-empty={!targetDate}
                     className="w-[212px] justify-between text-left font-normal data-[empty=true]:text-muted-foreground"
                   >
-                    {targetDate ? format(targetDate, "PPP") : <span>Pick a date</span>}
+                    {targetDate ? fmtDate(targetDate) : <span>Pick a date</span>}
                     <CalendarIcon />
                   </Button>
                 </PopoverTrigger>
@@ -576,7 +576,7 @@ function GoalForm() {
                 data-empty={!targetDate}
                 className="w-[212px] justify-between text-left font-normal data-[empty=true]:text-muted-foreground"
               >
-                {targetDate ? format(targetDate, "PPP") : <span>Pick a date</span>}
+                {targetDate ? fmtDate(targetDate) : <span>Pick a date</span>}
                 <CalendarIcon />
               </Button>
             </PopoverTrigger>

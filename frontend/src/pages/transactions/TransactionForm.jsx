@@ -169,6 +169,7 @@ import {
 } from "@/components/ui/popover"
 import { format } from "date-fns"
 import { Calendar as CalendarIcon } from 'lucide-react';
+import { fmtDate } from "../../utils/Formatters.js"
 
 const API_URL = import.meta.env.VITE_API_URL || ""
 
@@ -284,7 +285,7 @@ export default function TransactionForm() {
                 data-empty={!date}
                 className="w-[212px] justify-between text-left font-normal data-[empty=true]:text-muted-foreground"
               >
-                {date ? format(date, "PPP") : <span>Pick a date</span>}
+                {date ? fmtDate(date) : <span>Pick a date</span>}
                 <CalendarIcon />
               </Button>
             </PopoverTrigger>
