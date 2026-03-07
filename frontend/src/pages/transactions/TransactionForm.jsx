@@ -161,7 +161,29 @@ import {
   SelectItem
 } from "@/components/ui/select"
 
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { format } from "date-fns"
+import { Calendar as CalendarIcon } from 'lucide-react';
+
 const API_URL = import.meta.env.VITE_API_URL || ""
+
+const categories = [
+  "Food",
+  "Transport",
+  "Shopping",
+  "Entertainment",
+  "Bills",
+  "Rent",
+  "Health",
+  "Travel",
+  "Salary",
+  "Investment"
+]
 
 export default function TransactionForm() {
 
@@ -169,17 +191,21 @@ export default function TransactionForm() {
   const [amount, setAmount] = useState("")
   const [category, setCategory] = useState("")
   const [description, setDescription] = useState("")
-  const [date, setDate] = useState("")
+  // const [date, setDate] = useState("")
+  const [date, setDate] = useState(new Date())
+  const [openCalendar, setOpenCalendar] = useState(false)
 
   async function submit(e) {
     e.preventDefault()
+
+    if (!amount || !category || !date) return
 
     try {
       await axios.post(`${API_URL}/transactions/`, {
         amount: parseFloat(amount),
         category,
         description,
-        date,
+        date: date ? date.toISOString().split("T")[0] : null,
         type
       })
 
@@ -187,7 +213,7 @@ export default function TransactionForm() {
       setAmount("")
       setCategory("")
       setDescription("")
-      setDate("")
+      setDate(new Date())
 
       window.dispatchEvent(new Event("transactions:changed"))
 
@@ -225,26 +251,57 @@ export default function TransactionForm() {
             className="w-[140px]"
             required
           />
-          <Input
+          {/* <Input
             placeholder="Category"
             value={category}
             onChange={e => setCategory(e.target.value)}
             className="w-[160px]"
             required
-          />
+          /> */}
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+
+            <SelectContent>
+              {categories.map(c => (
+                <SelectItem key={c} value={c}>
+                  {c}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Input
             placeholder="Description"
             value={description}
             onChange={e => setDescription(e.target.value)}
             className="w-[200px]"
           />
-          <Input
-            type="date"
-            value={date}
-            onChange={e => setDate(e.target.value)}
-            className="w-[160px]"
-            required
-          />
+          <Popover open={openCalendar} onOpenChange={setOpenCalendar}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                data-empty={!date}
+                className="w-[212px] justify-between text-left font-normal data-[empty=true]:text-muted-foreground"
+              >
+                {date ? format(date, "PPP") : <span>Pick a date</span>}
+                <CalendarIcon />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0" align="start" style={{ width: 210 }}>
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={(date) => {
+                  if (!date) return
+                  date.setHours(0,0,0,0)
+                  setDate(date)
+                  setOpenCalendar(false)
+                }}
+                defaultMonth={date}
+              />
+            </PopoverContent>
+          </Popover>
           <Button type="submit">
             Add
           </Button>
@@ -253,173 +310,3 @@ export default function TransactionForm() {
     </Card>
   )
 }
-
-
-// import { useState } from "react"
-// import axios from "axios"
-// import { format } from "date-fns"
-// import { CalendarIcon } from "lucide-react"
-
-// import { Button } from "@/components/ui/button"
-// import { Input } from "@/components/ui/input"
-// import {
-//   Card,
-//   CardHeader,
-//   CardTitle,
-//   CardContent
-// } from "@/components/ui/card"
-
-// import {
-//   Select,
-//   SelectTrigger,
-//   SelectValue,
-//   SelectContent,
-//   SelectItem
-// } from "@/components/ui/select"
-
-// import {
-//   Popover,
-//   PopoverTrigger,
-//   PopoverContent
-// } from "@/components/ui/popover"
-
-// import { Calendar } from "@/components/ui/calendar"
-// import { cn } from "@/lib/utils"
-
-// const API_URL = import.meta.env.VITE_API_URL || ""
-
-// export default function TransactionForm() {
-
-//   const [type, setType] = useState("EXPENSE")
-//   const [amount, setAmount] = useState("")
-//   const [category, setCategory] = useState("")
-//   const [description, setDescription] = useState("")
-//   const [date, setDate] = useState(new Date())
-
-//   async function submit(e) {
-//     e.preventDefault()
-
-//     try {
-//       await axios.post(`${API_URL}/transactions/`, {
-//         amount: parseFloat(amount),
-//         category,
-//         description,
-//         date: date ? format(date, "yyyy-MM-dd") : null,
-//         type
-//       })
-
-//       setType("EXPENSE")
-//       setAmount("")
-//       setCategory("")
-//       setDescription("")
-//       setDate(new Date())
-
-//       window.dispatchEvent(new Event("transactions:changed"))
-
-//     } catch (err) {
-//       console.error(err)
-//       alert("Failed to add transaction")
-//     }
-//   }
-
-//   return (
-
-//     <Card className="mb-6">
-
-//       <CardHeader>
-//         <CardTitle>Add Transaction</CardTitle>
-//       </CardHeader>
-
-//       <CardContent>
-
-//         <form
-//           onSubmit={submit}
-//           className="flex flex-wrap gap-3 items-end"
-//         >
-
-//           {/* Type */}
-//           <div className="w-[140px]">
-//             <Select value={type} onValueChange={setType}>
-//               <SelectTrigger>
-//                 <SelectValue />
-//               </SelectTrigger>
-
-//               <SelectContent>
-//                 <SelectItem value="EXPENSE">Expense</SelectItem>
-//                 <SelectItem value="INCOME">Income</SelectItem>
-//               </SelectContent>
-//             </Select>
-//           </div>
-
-//           {/* Amount */}
-//           <Input
-//             type="number"
-//             step="0.01"
-//             placeholder="Amount"
-//             value={amount}
-//             onChange={e => setAmount(e.target.value)}
-//             className="w-[140px]"
-//             required
-//           />
-
-//           {/* Category */}
-//           <Input
-//             placeholder="Category"
-//             value={category}
-//             onChange={e => setCategory(e.target.value)}
-//             className="w-[160px]"
-//             required
-//           />
-
-//           {/* Description */}
-//           <Input
-//             placeholder="Description"
-//             value={description}
-//             onChange={e => setDescription(e.target.value)}
-//             className="w-[200px]"
-//           />
-
-//           {/* Date Picker */}
-//           <Popover>
-//             <PopoverTrigger asChild>
-
-//               <Button
-//                 variant="outline"
-//                 className={cn(
-//                   "w-[180px] justify-start text-left font-normal",
-//                   !date && "text-muted-foreground"
-//                 )}
-//               >
-//                 <CalendarIcon className="mr-2 h-4 w-4" />
-
-//                 {date ? format(date, "PPP") : "Pick a date"}
-
-//               </Button>
-
-//             </PopoverTrigger>
-
-//             <PopoverContent className="w-auto p-0">
-
-//               <Calendar
-//                 mode="single"
-//                 selected={date}
-//                 onSelect={setDate}
-//                 initialFocus
-//               />
-
-//             </PopoverContent>
-//           </Popover>
-
-//           {/* Submit */}
-//           <Button type="submit">
-//             Add
-//           </Button>
-
-//         </form>
-
-//       </CardContent>
-
-//     </Card>
-
-//   )
-// }
