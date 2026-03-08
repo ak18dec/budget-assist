@@ -112,7 +112,7 @@ export default function ChatInputBar({
           value={value}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          placeholder="Ask, search or chat..."
+          placeholder="Ask about your finances..."
           rows={1}
           className="
             resize-none border-0 bg-transparent

@@ -647,6 +647,7 @@ export default function ChatPanel() {
           variant="ghost"
           size="icon"
           onClick={clearChat}
+          className="cursor-pointer"
         >
           <GoTrash/>
         </Button>
