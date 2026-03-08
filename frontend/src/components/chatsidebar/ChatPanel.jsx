@@ -531,8 +531,6 @@
 
 
 import { useState, useRef, useEffect } from "react"
-
-import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
 import { GoTrash } from "react-icons/go"
@@ -576,7 +574,6 @@ export default function ChatPanel() {
   }
 
   async function send() {
-
     if (!inputText.trim() || loading) return;
 
     const userMessage = {
@@ -584,65 +581,62 @@ export default function ChatPanel() {
       text: inputText,
       sender: "user",
       timestamp: new Date(),
-    }
+    };
 
-    setMessages(prev => [...prev, userMessage])
-    setInputText("")
-    setLoading(true)
-
-    const botId = Date.now() + 1
+    const botId = Date.now() + 1;
 
     setMessages(prev => [
       ...prev,
+      userMessage,
       {
         id: botId,
-        text: "",
+        text: "...",
         sender: "bot",
         timestamp: new Date(),
-      }
-    ])
-
-    const res = await fetch(`${API_URL}/chat/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        user_id: "123",
-        message: userMessage.text,
-      }),
-    })
+    ]);
 
-    const reader = res.body.getReader()
-    const decoder = new TextDecoder()
+    setInputText("");
+    setLoading(true);
 
-    while (true) {
+    try {
+      const res = await fetch(`${API_URL}/chat/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: "123",
+          message: userMessage.text,
+        }),
+      });
 
-      const { done, value } = await reader.read()
+      if (!res.ok) {
+        throw new Error(`HTTP error: ${res.status}`);
+      }
 
-      if (done) break
-
-      const chunk = decoder.decode(value)
+      const data = await res.json(); // assuming API returns JSON
 
       setMessages(prev =>
-        prev.map(m =>
-          m.id === botId
-            ? { ...m, text: m.text + chunk }
-            : m
+        prev.map(msg =>
+          msg.id === botId
+            ? { ...msg, text: data.response } // adjust key based on API
+            : msg
         )
-      )
+      );
+
+    } catch (err) {
+      console.error("Chat error:", err);
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === botId
+            ? { ...msg, text: "Failed to get response" }
+            : msg
+        )
+      );
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false)
-  }
-
-  function handleKeyDown(e) {
-
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      send()
-    }
-
   }
 
   return (
@@ -658,7 +652,7 @@ export default function ChatPanel() {
         </Button>
       </div>
       <div className="flex-1 p-0">
-        <ScrollArea className="h-full px-4 py-3">
+        <ScrollArea className="h-full py-3">
           <div className="flex flex-col gap-4">
             {messages.map(message => (
               <ChatMessage
