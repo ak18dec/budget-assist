@@ -19,7 +19,7 @@ export default function ChatInputBar({
   }
 
   return (
-    <div className="border-t p-3">
+    <div className="border-t py-3">
       <div
         role="group"
         className="
