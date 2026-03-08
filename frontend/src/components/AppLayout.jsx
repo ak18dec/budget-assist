@@ -57,6 +57,7 @@ import {
 import AppSidebar from './appsidebar/AppSidebar'
 import { Outlet } from 'react-router-dom'
 import AppHeader from "@/components/appheader/AppHeader"
+import ChatSidebar from '@/components/chatsidebar/ChatSidebar'
 
 export default function AppLayout() {
   return (
@@ -66,6 +67,7 @@ export default function AppLayout() {
         <AppHeader />
         <Outlet />
       </SidebarInset>
+      <ChatSidebar />
     </SidebarProvider>
   )
 }
