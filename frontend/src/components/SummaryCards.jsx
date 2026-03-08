@@ -2,7 +2,6 @@ import {useEffect, useState} from 'react'
 import axios from 'axios'
 import { FiCreditCard, FiArrowUp, FiArrowDown } from 'react-icons/fi'
 import { fmtCurrency } from '../utils/Formatters.js'
-import './SummaryCards.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 

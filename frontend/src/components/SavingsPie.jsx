@@ -1,6 +1,5 @@
 import {useState, useMemo} from 'react'
 import { ResponsiveContainer, PieChart as RCChart, Pie, Cell, Tooltip } from 'recharts'
-import './SavingsPie.css'
 
 const PALETTE = {
   primary: 'var(--accent)',

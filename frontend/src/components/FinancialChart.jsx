@@ -2,7 +2,6 @@ import {useMemo, useState, useRef, useEffect} from 'react'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from 'recharts'
 import { FiInfo, FiArrowUp, FiArrowDown, FiChevronUp, FiChevronDown } from 'react-icons/fi'
 import { fmtCurrency } from '../utils/Formatters.js'
-import './FinancialChart.css'
 
 function YAxisFormatter(value){
   return `₹${(value/1000).toFixed(0)}K`

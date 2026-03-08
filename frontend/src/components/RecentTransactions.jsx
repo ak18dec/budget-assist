@@ -2,7 +2,6 @@ import {useEffect, useState} from 'react'
 import axios from 'axios'
 import { FiInfo } from 'react-icons/fi'
 import { fmtDateTime, fmtCurrency } from '../utils/Formatters.js'
-import './RecentTransactions.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 

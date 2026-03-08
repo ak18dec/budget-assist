@@ -4,7 +4,6 @@ import { GoMortarBoard } from 'react-icons/go'
 import { IoCarOutline } from "react-icons/io5";
 import axios from 'axios'
 import { fmtCurrency } from '../utils/Formatters.js'
-import './SavingsList.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
