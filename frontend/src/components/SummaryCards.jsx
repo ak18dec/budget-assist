@@ -141,8 +141,6 @@ export default function SummaryCards() {
         value={fmtCurrency(summary.total_balance || 0)}
         delta="+5%"
         positive={true}
-        color="#10b981"
-        points={[100, 140, 120, 160, 200, 180, 240]}
       />
 
       <SummaryCard
@@ -150,8 +148,6 @@ export default function SummaryCards() {
         value={fmtCurrency(summary.total_income || 0)}
         delta="-3%"
         positive={false}
-        color="#ef4444"
-        points={[80, 120, 160, 140, 130, 150, 120]}
       />
 
       <SummaryCard
@@ -159,8 +155,6 @@ export default function SummaryCards() {
         value={fmtCurrency(summary.total_expense || 0)}
         delta="+2%"
         positive={true}
-        color="#10b981"
-        points={[60, 70, 90, 110, 120, 130, 140]}
       />
     </div>
   )
