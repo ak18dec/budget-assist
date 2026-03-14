@@ -360,27 +360,51 @@ export default function FinancialChart() {
 
   return (
     <Card className="@container/card">
-      <CardHeader>
-        <CardTitle>Total Visitors</CardTitle>
-        <CardDescription>
-          <span className="hidden @[540px]/card:block">
+      <CardHeader className="flex flex-row items-start justify-between space-y-0">
+        <div className="space-y-1.5">
+          <CardTitle>Total Visitors</CardTitle>
+          <CardDescription className="text-xs font-light">
             Total for the last 3 months
-          </span>
-          <span className="@[540px]/card:hidden">Last 3 months</span>
-        </CardDescription>
-        {/* <CardFooter> */}
-          <ToggleGroup
-            type="single"
-            value={timeRange}
-            onValueChange={setTimeRange}
-            variant="outline"
-            className="hidden *:data-[slot=toggle-group-item]:px-4! @[767px]/card:flex"
+          </CardDescription>
+        </div>
+        <ToggleGroup
+          type="single"
+          size="sm"
+          value={timeRange}
+          onValueChange={(v) => v && setTimeRange(v)}
+          className="hidden @[767px]/card:inline-flex w-fit rounded-md border bg-muted overflow-hidden gap-0"
+        >
+          <ToggleGroupItem
+            value="90d"
+            className="h-8 px-3 text-xs rounded-none border-0 bg-transparent shadow-none
+            text-muted-foreground
+            data-[state=on]:bg-background
+            data-[state=on]:text-foreground"
           >
-            <ToggleGroupItem value="90d">Last 3 months</ToggleGroupItem>
-            <ToggleGroupItem value="30d">Last 30 days</ToggleGroupItem>
-            <ToggleGroupItem value="7d">Last 7 days</ToggleGroupItem>
-          </ToggleGroup>
-          <Select value={timeRange} onValueChange={setTimeRange}>
+            Last 3 months
+          </ToggleGroupItem>
+
+          <ToggleGroupItem
+            value="30d"
+            className="h-8 px-3 text-xs rounded-none border-l border-border bg-transparent shadow-none
+            text-muted-foreground
+            data-[state=on]:bg-background
+            data-[state=on]:text-foreground"
+          >
+            Last 30 days
+          </ToggleGroupItem>
+
+          <ToggleGroupItem
+            value="7d"
+            className="h-8 px-3 text-xs rounded-none border-l border-border bg-transparent shadow-none
+            text-muted-foreground
+            data-[state=on]:bg-background
+            data-[state=on]:text-foreground"
+          >
+            Last 7 days
+          </ToggleGroupItem>
+        </ToggleGroup>
+        <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger
               className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
               size="sm"
@@ -400,7 +424,6 @@ export default function FinancialChart() {
               </SelectItem>
             </SelectContent>
           </Select>
-        {/* </CardFooter> */}
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
