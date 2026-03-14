@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react"
+// import { useEffect, useState } from "react"
 import SummaryCards from '../../components/SummaryCards'
 import FinancialChart from '../../components/FinancialChart'
-import RecentTransactions from '../../components/RecentTransactions'
-import SavingsList from '../../components/SavingsList'
-import { FiInfo } from 'react-icons/fi'
-import { rangeToQuery } from '../../utils/Formatters.js'
+// import RecentTransactions from '../../components/RecentTransactions'
+// import SavingsList from '../../components/SavingsList'
+// import { FiInfo } from 'react-icons/fi'
+// import { rangeToQuery } from '../../utils/Formatters.js'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -67,7 +67,9 @@ export default function Dashboard() {
         <div className="aspect-video rounded-xl bg-muted/50" />
       </div> */}
       <SummaryCards />
-      <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
+      <div className="min-h-[100vh] flex-1 rounded-xl md:min-h-min">
+        <FinancialChart />
+      </div>
     </div>
   )
 }
