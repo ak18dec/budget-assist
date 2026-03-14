@@ -1,8 +1,8 @@
 // import { useEffect, useState } from "react"
 import SummaryCards from '../../components/SummaryCards'
 import FinancialChart from '../../components/FinancialChart'
-// import RecentTransactions from '../../components/RecentTransactions'
-// import SavingsList from '../../components/SavingsList'
+import RecentTransactions from '../../components/RecentTransactions'
+import SavingsList from '../../components/SavingsList'
 // import { FiInfo } from 'react-icons/fi'
 // import { rangeToQuery } from '../../utils/Formatters.js'
 
@@ -69,6 +69,9 @@ export default function Dashboard() {
       <SummaryCards />
       <div className="min-h-[100vh] flex-1 rounded-xl md:min-h-min">
         <FinancialChart />
+      </div>
+      <div className="min-h-[100vh] flex-1 rounded-xl md:min-h-min">
+        <RecentTransactions />
       </div>
     </div>
   )
