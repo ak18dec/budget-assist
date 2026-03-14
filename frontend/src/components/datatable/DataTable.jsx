@@ -265,7 +265,7 @@ export function DataTable({ columns, data, loading }) {
               {table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  className="hover:bg-muted/50 transition-colors"
+                  className="hover:bg-muted/40 transition-colors"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
