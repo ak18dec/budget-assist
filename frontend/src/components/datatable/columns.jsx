@@ -140,25 +140,24 @@
 
 
 import MerchantAvatar from "@/components/datatable/ux/MerchantAvatar"
-import { TransactionActions } from "@/components/datatable/ux/TransactionActions"
 import { Badge } from "@/components/ui/badge"
 import { fmtDateTime, fmtCurrency } from "@/utils/Formatters"
 
 export const columns = [
   {
-    accessorKey: "name",
+    accessorKey: "category",
     header: "Transaction",
     cell: ({ row }) => {
       const tx = row.original
 
       return (
         <div className="flex items-center gap-3">
-          <MerchantAvatar name={tx.name} />
+          <MerchantAvatar name={tx.category} />
 
           <div className="flex flex-col">
-            <span className="text-sm font-medium">{tx.name}</span>
+            <span className="text-sm font-medium">{tx.category}</span>
             <span className="text-xs text-muted-foreground">
-              {tx.category}
+              {tx.description}
             </span>
           </div>
         </div>
@@ -167,11 +166,12 @@ export const columns = [
   },
 
   {
-    id: "status",
+    id: "type",
     header: "Type",
+    accessorFn: (row) => (row.type === 'INCOME' ? "INCOME" : "EXPENSE"),
     cell: ({ row }) => {
-      const amount = row.original.amount
-      const isIncome = amount >= 0
+      const type = row.original.type
+      const isIncome = type === 'INCOME'
 
       return (
         <Badge variant={isIncome ? "default" : "secondary"}>
@@ -196,11 +196,13 @@ export const columns = [
     header: "Amount",
     cell: ({ row }) => {
       const amount = row.original.amount
+      const type = row.original.type
+      const isIncome = type === 'INCOME'
 
       return (
         <div
           className={`text-right font-medium ${
-            amount >= 0
+            isIncome
               ? "text-emerald-600 dark:text-emerald-400"
               : "text-destructive"
           }`}

@@ -5,9 +5,9 @@ export function DataTableToolbar({ table }) {
     <div className="flex items-center justify-between">
       <Input
         placeholder="Search transactions..."
-        value={table.getColumn("name")?.getFilterValue() ?? ""}
+        value={table.getColumn("category")?.getFilterValue() ?? ""}
         onChange={(event) =>
-          table.getColumn("name")?.setFilterValue(event.target.value)
+          table.getColumn("category")?.setFilterValue(event.target.value)
         }
         className="max-w-sm shadow-none"
       />

@@ -278,26 +278,8 @@ import { columns } from "@/components/datatable/columns"
 
 const API_URL = import.meta.env.VITE_API_URL || ""
 
-const DUMMY = [
-  { id: "t1", name: "Paypal", category: "Income", date: "2023-08-08T05:02:00Z", amount: 1240.41 },
-  { id: "t2", name: "Netflix", category: "Entertainment", date: "2023-08-08T14:16:00Z", amount: -15.49 },
-  { id: "t3", name: "Notion", category: "Productivity", date: "2023-08-07T18:01:00Z", amount: -9.72 },
-  { id: "t4", name: "Stripe", category: "Income", date: "2023-08-06T09:10:00Z", amount: 320.0 },
-  { id: "t5", name: "Amazon", category: "Shopping", date: "2023-08-05T12:30:00Z", amount: -45.99 },
-  { id: "t6", name: "Apple Store", category: "Gadgets", date: "2023-08-04T16:45:00Z", amount: -199.99 },
-  { id: "t7", name: "Uber", category: "Transport", date: "2023-08-03T20:15:00Z", amount: -23.5 },
-  { id: "t8", name: "Starbucks", category: "Food & Drinks", date: "2023-08-02T08:20:00Z", amount: -5.75 },
-  { id: "t9", name: "Google Ads", category: "Marketing", date: "2023-08-01T14:00:00Z", amount: -150.0 },
-  { id: "t10", name: "Freelance", category: "Income", date: "2023-07-31T10:00:00Z", amount: 600.0 },
-  { id: "t11", name: "Spotify", category: "Entertainment", date: "2023-07-30T18:30:00Z", amount: -9.99 },
-  { id: "t12", name: "Electricity Bill", category: "Utilities", date: "2023-07-29T09:00:00Z", amount: -75.0 },
-  { id: "t13", name: "Airbnb", category: "Travel", date: "2023-07-28T15:00:00Z", amount: -250.0 },
-  { id: "t14", name: "GitHub Sponsors", category: "Income", date: "2023-07-27T11:30:00Z", amount: 80.0 },
-  { id: "t15", name: "Grocery Store", category: "Food & Drinks", date: "2023-07-26T17:45:00Z", amount: -120.5 }
-]
-
 export default function RecentTransactions() {
-  const [items, setItems] = useState([...DUMMY])
+  const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -306,6 +288,8 @@ export default function RecentTransactions() {
         const res = await axios.get(`${API_URL}/transactions`)
         const rows =
           res.data.transactions || res.data.items || res.data || []
+
+          console.log(rows)
 
         setItems(rows)
       } catch (e) {
