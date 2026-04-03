@@ -1,7 +1,16 @@
 import {useEffect, useState, useRef} from 'react'
-import { FiSearch, FiBell, FiDownload, FiSun, FiMoon } from 'react-icons/fi'
+import { useLocation, Link } from "react-router-dom"
 import { timeAgo } from '../utils/Formatters.js'
-import './Topbar.css'
+import { Button } from "@/components/ui/button"
+import { Download, Sun, Moon, Bell } from 'lucide-react';
+import { useTheme } from "next-themes"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -44,24 +53,12 @@ function exportTransactions(){
 }
 
 function ThemeToggle() {
-  const [theme, setTheme] = useState(
-    document.documentElement.dataset.theme || "light"
-  );
-
-  const toggleTheme = () => {
-    const next = theme === "dark" ? "light" : "dark";
-    document.documentElement.dataset.theme = next;
-    setTheme(next);
-  };
+  const { theme, setTheme } = useTheme()
 
   return (
-    <button
-      className="button export"
-      onClick={toggleTheme}
-      aria-label="Toggle theme"
-    >
-      {theme === "dark" ? <FiSun size={14} /> : <FiMoon size={14} />}
-    </button>
+    <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Toggle theme" className="cursor-pointer">
+      {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
+    </Button>
   );
 }
 
@@ -125,10 +122,10 @@ function NotificationBell(){
 
   return (
     <div style={{position:'relative'}}>
-      <button ref={btnRef} className="icon-btn notif" aria-haspopup="menu" aria-expanded={open} onClick={toggle} onKeyDown={(e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); toggle() } }}>
-        <FiBell size={18} />
+      <Button ref={btnRef} variant="ghost" size="icon" className="cursor-pointer" aria-haspopup="menu" aria-expanded={open} onClick={toggle} onKeyDown={(e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); toggle() } }}>
+        <Bell size={14} />
         {unreadCount > 0 && <span className="notif-dot" />}
-      </button>
+      </Button>
 
       {open && (
         <div ref={menuRef} className="notif-dropdown card" role="menu" aria-label="Notifications list" style={{position:'absolute', right:0, top:40, width:300, zIndex:30}}>
@@ -158,30 +155,83 @@ function NotificationBell(){
   )
 }
 
+// export default function Topbar(){
+//   return (
+//     <div className="topbar">
+//       <div className="topbar-left">
+//         <div>
+//           <h1 style={{margin:0, marginBottom:5}}>Good Morning, Harry</h1>
+//           <Button>Button</Button>
+//           <div className="muted" style={{fontSize:14}}>Welcome to your financial insights.</div>
+//         </div>
+//       </div>
+
+//       <div className="topbar-right">
+//         <button className="icon-btn" aria-label="Search">
+//           <FiSearch size={18} />
+//         </button>
+
+//         <NotificationBell />
+
+//         <ThemeToggle />
+
+//         <button className="button export" onClick={exportTransactions} aria-label="Export transactions">
+//           <FiDownload size={14} style={{marginRight:8}} />
+//           Export
+//         </button>
+//       </div>
+//     </div>
+//   )
+// }
+
 export default function Topbar(){
+
+  const location = useLocation()
+  const path = location.pathname
+  const isDashboard = path === "/" || path === "/dashboard"
+
+  const routeTitles = {
+    transactions: "Transactions",
+    budgets: "Budgets",
+    goals: "Goals",
+  }
+
+  const segment = path.split("/")[1]
+  const pageTitle = routeTitles[segment]
+
+
   return (
-    <div className="topbar">
-      <div className="topbar-left">
-        <div>
-          <h1 style={{margin:0, marginBottom:5}}>Good Morning, Harry</h1>
-          <div className="muted" style={{fontSize:14}}>Welcome to your financial insights.</div>
-        </div>
-      </div>
-
-      <div className="topbar-right">
-        <button className="icon-btn" aria-label="Search">
-          <FiSearch size={18} />
-        </button>
-
-        <NotificationBell />
-
-        <ThemeToggle />
-
-        <button className="button export" onClick={exportTransactions} aria-label="Export transactions">
-          <FiDownload size={14} style={{marginRight:8}} />
-          Export
-        </button>
-      </div>
+    <>
+    <div id="title-header">
+      {isDashboard ? (
+        <>
+          <h1 className="text-base font-medium text-sm">Good Morning, Harry</h1>
+          <span className="text-xs">Welcome to your financial insights.</span>
+        </>
+        ) : (
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <Link to="/" className="hover:text-primary transition-colors">
+                  Home
+                </Link>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{pageTitle}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb> 
+        )}
+              
     </div>
+    <div className="ml-auto flex items-center gap-2">
+      <NotificationBell />
+      <ThemeToggle />
+      <Button variant="ghost" size="sm" className="hidden sm:flex cursor-pointer" onClick={exportTransactions} >
+        <Download />Export
+      </Button>
+    </div>
+    </>
   )
 }

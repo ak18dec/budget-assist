@@ -62,7 +62,6 @@ app.include_router(goals.router, prefix="/api/v1/goals", tags=["goals"])
 app.include_router(summary.router, prefix="/api/v1/summary", tags=["summary"])
 app.include_router(chat.router, prefix="/api/v1/chat", tags=["chat"])
 app.include_router(agent.router, prefix="/api/v1/agent", tags=["agent"])
-app.include_router(rag_routes.router, prefix="/api/v1/rag", tags=["rag"])
 app.include_router(notifications.router, prefix="/api/v1/notifications", tags=["notifications"])
 
 @app.get("/")

@@ -20,7 +20,7 @@ def add_transaction(tx: TransactionBase) -> Transaction:
 
 def list_transactions() -> list[Transaction]:
     with db_transaction() as cursor:
-        cursor.execute("SELECT * FROM transactions")
+        cursor.execute("SELECT * FROM transactions ORDER BY date DESC")
         rows = cursor.fetchall()
         return [Transaction(**dict(r)) for r in rows]
 
