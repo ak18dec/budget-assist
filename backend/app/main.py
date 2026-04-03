@@ -2,7 +2,7 @@ import os
 import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import transactions, budgets, goals, summary, chat, agent, rag_routes, notifications
+from app.routes import transactions, budgets, goals, summary, chat, agent, notifications
 from app.agents import notification_engine
 # from app import rag
 from contextlib import asynccontextmanager
