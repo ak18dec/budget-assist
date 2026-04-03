@@ -2,7 +2,7 @@ import logging
 from typing import Dict, Any, Optional
 
 from app.agents.intent_classifier import classify_intent
-from app.agents.tool_router import execute_tool
+from app.agents.tool_executor import execute_intent
 from app.agents.response_composer import compose_response
 from app.agents.insight_engine import generate_insights
 
@@ -47,11 +47,14 @@ def run_agent(
         # 2️⃣ TOOL EXECUTION
         # --------------------------------------------
         if allow_tools:
-            tool_name, tool_result = execute_tool(
-                intent=intent,
-                entities=entities
-            )
+            intent_data = {
+                "intent": intent,
+                "entities": entities
+            }
 
+            result = execute_intent(intent_data)
+            tool_name = result.get("tool")
+            tool_result = result.get("result")
         # --------------------------------------------
         # 3️⃣ INSIGHT GENERATION (Smart Layer)
         # --------------------------------------------
