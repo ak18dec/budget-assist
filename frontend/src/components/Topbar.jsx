@@ -12,6 +12,18 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+
+import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/ui/scroll-area"
+
 const API_URL = import.meta.env.VITE_API_URL || '';
 
 async function fetchTransactions(){
@@ -63,8 +75,8 @@ function ThemeToggle() {
 }
 
 function NotificationBell(){
-  const [open, setOpen] = useState(false)
   const [notifications, setNotifications] = useState([])
+
   const btnRef = useRef(null)
   const menuRef = useRef(null)
 
@@ -81,7 +93,7 @@ function NotificationBell(){
       const data = await res.json()
       setNotifications(Array.isArray(data) ? data : [])
     } catch (e) {
-      console.error('Failed to load notifications', e)
+      console.error("Failed to load notifications", e)
     }
   }
 
@@ -118,74 +130,71 @@ function NotificationBell(){
     )
   }
 
-  const toggle = ()=> setOpen(v=>!v)
-
   return (
-    <div style={{position:'relative'}}>
-      <Button ref={btnRef} variant="ghost" size="icon" className="cursor-pointer" aria-haspopup="menu" aria-expanded={open} onClick={toggle} onKeyDown={(e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); toggle() } }}>
-        <Bell size={14} />
-        {unreadCount > 0 && <span className="notif-dot" />}
-      </Button>
-
-      {open && (
-        <div ref={menuRef} className="notif-dropdown card" role="menu" aria-label="Notifications list" style={{position:'absolute', right:0, top:40, width:300, zIndex:30}}>
-          <div style={{fontWeight:700, marginBottom:8}}>Notifications</div>
-          {notifications.length === 0 && (
-            <div className="muted" style={{ fontSize: 13 }}>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative cursor-pointer"
+        >
+          <Bell className="h-4 w-4" />
+          {unreadCount > 0 && (
+            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="end"
+        className="w-80 p-0"
+      >
+        <div className="flex items-center justify-between px-3 py-2">
+          <DropdownMenuLabel className="p-0">
+            Notifications
+          </DropdownMenuLabel>
+          {unreadCount > 0 && (
+            <Badge variant="secondary" className="text-xs">
+              {unreadCount} new
+            </Badge>
+          )}
+        </div>
+        <DropdownMenuSeparator />
+        <ScrollArea className="max-h-80">
+          {notifications.length === 0 ? (
+            <div className="p-4 text-sm text-muted-foreground text-center">
               No notifications
             </div>
+          ) : (
+            notifications.map((n) => (
+              <DropdownMenuItem
+                key={n.id}
+                onClick={() => markRead(n.id)}
+                className="flex flex-col items-start gap-1 px-3 py-2 cursor-pointer"
+              >
+                <div className="flex items-center gap-2 w-full">
+                  <span className="font-medium text-sm">
+                    {n.title}
+                  </span>
+                  {!n.read && (
+                    <span className="ml-auto h-2 w-2 rounded-full bg-blue-500" />
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground line-clamp-2">
+                  {n.message}
+                </p>
+                <span className="text-[10px] text-muted-foreground">
+                  {timeAgo(n.created_at)}
+                </span>
+              </DropdownMenuItem>
+            ))
           )}
-
-          <div style={{display:'flex', flexDirection:'column', gap:8}}>
-            {notifications.map(n=> (
-              <button key={n.id} className={`notif-item ${n.read ? 'read' : ''}`} role="menuitem" 
-                onClick={ () => {
-                  markRead(n.id) 
-                  setOpen(false); 
-                }}>
-                <div style={{fontWeight:600}}>{n.title}</div>
-                <div className="muted" style={{fontSize:12}}>{n.message}</div>
-                <div className="muted" style={{fontSize:11, marginTop:6}}>{timeAgo(n.created_at)}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+        </ScrollArea>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 
-// export default function Topbar(){
-//   return (
-//     <div className="topbar">
-//       <div className="topbar-left">
-//         <div>
-//           <h1 style={{margin:0, marginBottom:5}}>Good Morning, Harry</h1>
-//           <Button>Button</Button>
-//           <div className="muted" style={{fontSize:14}}>Welcome to your financial insights.</div>
-//         </div>
-//       </div>
-
-//       <div className="topbar-right">
-//         <button className="icon-btn" aria-label="Search">
-//           <FiSearch size={18} />
-//         </button>
-
-//         <NotificationBell />
-
-//         <ThemeToggle />
-
-//         <button className="button export" onClick={exportTransactions} aria-label="Export transactions">
-//           <FiDownload size={14} style={{marginRight:8}} />
-//           Export
-//         </button>
-//       </div>
-//     </div>
-//   )
-// }
-
 export default function Topbar(){
-
   const location = useLocation()
   const path = location.pathname
   const isDashboard = path === "/" || path === "/dashboard"
@@ -199,39 +208,38 @@ export default function Topbar(){
   const segment = path.split("/")[1]
   const pageTitle = routeTitles[segment]
 
-
   return (
     <>
-    <div id="title-header">
-      {isDashboard ? (
-        <>
-          <h1 className="text-base font-medium text-sm">Good Morning, Harry</h1>
-          <span className="text-xs">Welcome to your financial insights.</span>
-        </>
-        ) : (
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <Link to="/" className="hover:text-primary transition-colors">
-                  Home
-                </Link>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{pageTitle}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb> 
-        )}
-              
-    </div>
-    <div className="ml-auto flex items-center gap-2">
-      <NotificationBell />
-      <ThemeToggle />
-      <Button variant="ghost" size="sm" className="hidden sm:flex cursor-pointer" onClick={exportTransactions} >
-        <Download />Export
-      </Button>
-    </div>
+      <div id="title-header">
+        {isDashboard ? (
+          <>
+            <h1 className="text-base font-medium text-sm">Good Morning, Harry</h1>
+            <span className="text-xs">Welcome to your financial insights.</span>
+          </>
+          ) : (
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <Link to="/" className="hover:text-primary transition-colors">
+                    Home
+                  </Link>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{pageTitle}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb> 
+          )}
+                
+      </div>
+      <div className="ml-auto flex items-center gap-2">
+        <NotificationBell />
+        <ThemeToggle />
+        <Button variant="ghost" size="sm" className="hidden sm:flex cursor-pointer" onClick={exportTransactions} >
+          <Download />Export
+        </Button>
+      </div>
     </>
   )
 }
