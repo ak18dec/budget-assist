@@ -4,7 +4,7 @@ This folder contains a beginner-friendly FastAPI backend scaffold with:
 
 - `app/main.py` - FastAPI application and router wiring
 - `app/models.py` - Pydantic models
-- `app/storage.py` - simple in-memory storage (lists, helpers)
+- `app/storage.py` - simple sqlite db
 - `app/routes/*` - API routes for transactions, budgets, goals, summary, and chat
 - `app/agents/` - empty agents package (for future tooling)
 
