@@ -8,7 +8,7 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.post("/", tags=["agent"])
+@router.post("", tags=["agent"])
 def agent_chat(req: ChatRequest):
     try:
         conv_context = conversation_storage.get_conversation_context(limit=None)

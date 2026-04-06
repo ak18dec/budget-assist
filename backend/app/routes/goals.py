@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.post("/", response_model=Goal)
+@router.post("", response_model=Goal)
 def create_goal(goal: GoalBase):
     created = storage.add_goal(goal)
     # Sync RAG with updated goal data
@@ -19,7 +19,7 @@ def create_goal(goal: GoalBase):
     #     logger.warning(f"Failed to sync RAG after goal creation: {e}")
     return created
 
-@router.get("/", response_model=list[Goal])
+@router.get("", response_model=list[Goal])
 def get_goals():
     return storage.list_goals()
 

@@ -5,7 +5,7 @@ from app.models import Notification
 router = APIRouter()
 
 @router.get("", include_in_schema=False, response_model=list[Notification])
-@router.get("/", response_model=list[Notification])
+@router.get("", response_model=list[Notification])
 def get_notifications():
     return storage.list_notifications()
 

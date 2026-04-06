@@ -100,7 +100,7 @@ function NotificationBell(){
   // initial load + polling
   useEffect(() => {
     loadNotifications()
-    const t = setInterval(loadNotifications, 10000)
+    const t = setInterval(loadNotifications, 100000)
     return () => clearInterval(t)
   }, [])
 

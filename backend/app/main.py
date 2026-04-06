@@ -2,12 +2,13 @@ import os
 import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import transactions, budgets, goals, summary, chat, agent, notifications
+from app.routes import transactions, budgets, goals, summary, chat, agent, notifications, tester
 from app.agents import notification_engine
 # from app import rag
 from contextlib import asynccontextmanager
 from app.db import init_db
 
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 @asynccontextmanager
@@ -19,8 +20,8 @@ async def lifespan(app: FastAPI):
     init_db()
 
     # Initialize notification system
-    notification_engine.setup_event_handlers()
-    logger.info("Notification engine handlers registered")
+    # notification_engine.setup_event_handlers()
+    # logger.info("Notification engine handlers registered")
 
     # Initialize RAG with financial data
     # try:
@@ -63,6 +64,7 @@ app.include_router(summary.router, prefix="/api/v1/summary", tags=["summary"])
 app.include_router(chat.router, prefix="/api/v1/chat", tags=["chat"])
 app.include_router(agent.router, prefix="/api/v1/agent", tags=["agent"])
 app.include_router(notifications.router, prefix="/api/v1/notifications", tags=["notifications"])
+app.include_router(tester.router, prefix="/api/v1/tester", tags=["tester"]) 
 
 @app.get("/")
 def root():

@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.post("/", response_model=Transaction)
+@router.post("", response_model=Transaction)
 def create_transaction(tx: TransactionBase):
     transaction = TransactionBase(**tx.model_dump())  # Validate input and create Transaction instance
     created = storage.add_transaction(transaction)
@@ -26,11 +26,11 @@ def create_transaction(tx: TransactionBase):
     logger.info(f"Emitting transaction.created event for transaction {created.id}")
 
     # Emit event for new transaction
-    eventing.emit("transaction.created", payload)
+    # eventing.emit("transaction.created", payload)
 
     return created
 
 
-@router.get("/", response_model=list[Transaction])
+@router.get("", response_model=list[Transaction])
 def get_transactions():
     return storage.list_transactions()

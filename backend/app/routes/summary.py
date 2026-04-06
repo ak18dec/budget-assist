@@ -6,7 +6,7 @@ from app.repositories import summary_repo as storage
 router = APIRouter()
 
 
-@router.get("/", response_model=FinancialSummary)
+@router.get("", response_model=FinancialSummary)
 def get_summary():
     return storage.get_financial_summary()
 

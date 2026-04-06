@@ -15,7 +15,7 @@ router = APIRouter()
 # MAIN CHAT ENDPOINT
 # ------------------------------------------------------------------
 
-@router.post("/", response_model=ChatResponse)
+@router.post("", response_model=ChatResponse)
 async def chat(req: ChatRequest):
     """
     Main AI Chat endpoint.
@@ -46,7 +46,9 @@ async def chat(req: ChatRequest):
             limit=20
         )
 
-        logger.debug(f"Loaded conversation context for user {req.user_id}")
+        logger.info(f"---------------------------------------------------------------")
+
+        logger.debug(f"Loaded conversation context {context_string} for user {req.user_id}")
 
         # ----------------------------------------
         # 2️⃣ Store user message
@@ -62,6 +64,7 @@ async def chat(req: ChatRequest):
         # ----------------------------------------
         # 3️⃣ Run AI Agent
         # ----------------------------------------
+        logger.debug(f"Running agent for user {req.user_id} with input: {req.message} and context: {context_string}")
         result = run_agent(
             user_id=req.user_id,
             user_input=req.message,
@@ -70,6 +73,7 @@ async def chat(req: ChatRequest):
         )
 
         assistant_response = result.get("response", "")
+        logger.debug(f"Agent result for user {req.user_id}: {result}")
 
         # ----------------------------------------
         # 4️⃣ Store assistant response
@@ -81,6 +85,7 @@ async def chat(req: ChatRequest):
         )
 
         logger.info(f"Assistant response stored for user {req.user_id}")
+        logger.info(f"---------------------------------------------------------------")
 
         # ----------------------------------------
         # 5️⃣ Return structured response

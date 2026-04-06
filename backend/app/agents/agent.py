@@ -33,7 +33,12 @@ def run_agent(
         # --------------------------------------------
         # 1️⃣ INTENT CLASSIFICATION
         # --------------------------------------------
-        intent_result = classify_intent(user_input)
+        # intent_result = classify_intent(user_input)
+        intent_result = classify_intent(
+                            message=user_input,
+                            conversation_history=conversation_history,
+                            user_id=user_id
+                        )
 
         intent = intent_result.get("intent")
         entities = intent_result.get("entities", {})

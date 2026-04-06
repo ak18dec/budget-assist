@@ -36,7 +36,7 @@ def execute_intent(intent_data: Dict[str, Any]) -> Dict[str, Any]:
                 _serialize_list(goals_repo.list_goals())
             )
 
-        elif intent in ["show_summary", "financial_summary"]:
+        elif intent in ["show_summary", "financial_summary", "financial_health_analysis"]:
             return _success(
                 "financial_summary",
                 summary_repo.get_financial_summary()
