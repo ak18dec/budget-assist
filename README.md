@@ -64,11 +64,7 @@ Notes & features
 - Event-driven alerts: events emitted (e.g., `transaction.created`) run handlers in `app/agents/eventing.py` and alerts are sent to registered webhooks via `app/agents/notifier.py`.
 - Consent & auto-allocation: prototypes in `app/agents/consent.py` to suggest transfers without performing them.
 
-Next steps (suggestions)
+Next steps
 
-- Add persistent storage (Postgres) and persist Chroma vectors.
-- Harden webhook delivery (HMAC signing, retries, delivery logs).
 - Replace rule-based intent classification with a production NLU or gated LLM service.
 - Improve frontend with alert inbox and RAG document manager.
-
-If you'd like, I can implement any of the next steps (pick one) or adjust sample data and UI elements.
